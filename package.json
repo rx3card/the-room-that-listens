@@ -1,0 +1,30 @@
+{
+  "name": "the-room-that-listens",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "An interactive horror story in the browser. The site really listens.",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "check": "tsc --noEmit && vitest run"
+  },
+  "dependencies": {
+    "@fontsource-variable/host-grotesk": "^5.3.0",
+    "@fontsource/courier-prime": "^5.3.0",
+    "postprocessing": "^6.39.5",
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "@gltf-transform/cli": "^4.5.1",
+    "@playwright/test": "^1.64.1",
+    "@types/three": "^0.187.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  }
+}
