@@ -51,7 +51,8 @@ function tunnel() {
 
 function wires(q: Quality) {
   const n = q.wires
-  const base = new THREE.CylinderGeometry(0.008, 0.016, 1, 4, 5, true)
+  // a ribbon that always faces the camera: two triangles per segment, so tens of thousands stay cheap
+  const base = new THREE.PlaneGeometry(1, 1, 1, 5)
   base.translate(0, 0.5, 0)
   const g = new THREE.InstancedBufferGeometry()
   g.index = base.index
@@ -59,7 +60,7 @@ function wires(q: Quality) {
   g.instanceCount = n
   const aBase = new Float32Array(n * 3), aDir = new Float32Array(n * 3), aInfo = new Float32Array(n * 3)
   for (let i = 0; i < n; i++) {
-    const p = Math.random() ** 0.8 * 0.985
+    const p = Math.random() * 0.985
     const { c, side, up } = frame(p)
     const R = tubeR(p)
     const floor = Math.random() < 0.68
@@ -70,13 +71,14 @@ function wires(q: Quality) {
     aBase.set([b.x, b.y, b.z], i * 3)
     aDir.set([dir.x, dir.y, dir.z], i * 3)
     // walls of length grow toward the apex, as hair bundles do
-    const len = (floor ? 1.05 : 0.8) * lerp(0.7, 1.15, p) * (0.65 + Math.random() * 0.5) * (1 - Math.abs(u) * 0.5)
+    const len = (floor ? 1.5 : 1.0) * lerp(0.85, 1.1, p) * (0.6 + Math.random() * 0.6) * (1 - Math.abs(u) * 0.4)
     aInfo.set([p, len, Math.random()], i * 3)
   }
   g.setAttribute('aBase', new THREE.InstancedBufferAttribute(aBase, 3))
   g.setAttribute('aDir', new THREE.InstancedBufferAttribute(aDir, 3))
   g.setAttribute('aInfo', new THREE.InstancedBufferAttribute(aInfo, 3))
   const m = new THREE.ShaderMaterial({
+    transparent: true, // drawn after any plate, so the wires stay alive on top of a painting
     uniforms: {
       uT: { value: 0 },
       uWave: { value: 0 },
@@ -90,8 +92,7 @@ function wires(q: Quality) {
     },
     vertexShader: /* glsl */ `
       attribute vec3 aBase,aDir,aInfo; uniform float uT,uWave,uAmp,uStill; uniform vec3 uG0,uG1,uG2,uG3,uCam;
-      varying float vTip,vLit,vFog;
-      float seg(vec3 p,vec3 a,vec3 b){ vec3 pa=p-a,ba=b-a; float h=clamp(dot(pa,ba)/dot(ba,ba),0.,1.); return length(pa-ba*h); }
+      varying float vTip,vLit,vFog,vNear;
       vec3 repel(vec3 p,vec3 a,vec3 b){ vec3 pa=p-a,ba=b-a; float h=clamp(dot(pa,ba)/dot(ba,ba),0.,1.); vec3 d=pa-ba*h; float l=length(d)+.001; float s=smoothstep(.62,.16,l); return d/l*s*.62; }
       void main(){
         float y=position.y; float p=aInfo.x, L=aInfo.y, s=aInfo.z;
@@ -103,23 +104,26 @@ function wires(q: Quality) {
         vec3 sway=vec3(sin(uT*.9+s*40.),0.,cos(uT*.7+s*30.))*.04*(1.-uStill);
         w+=normalize(cross(aDir,vec3(.3,.2,.9)))*tw*(.05*uAmp+env*.3)*k*(1.-uStill*.9)+sway*k;
         w+=(repel(w,uG0,uG1)+repel(w,uG2,uG3))*k*1.1;
-        vec3 side=cross(aDir,normalize(uCam-aBase));
-        vec3 pos=w+ (normalize(side)*position.x + aDir*0.)*(1.-y*.8);
+        // the wires part for the visitor too, and do not quite touch them
+        vec3 toCam=w-uCam; float dc=length(toCam.xz)+.001; w.xz+=toCam.xz/dc*smoothstep(1.3,.3,dc)*.8*k;
+        vec3 side=normalize(cross(aDir,uCam-w));
+        vec3 pos=w+side*position.x*mix(.013,.003,y);
         vec4 mv=viewMatrix*vec4(pos,1.);
-        vTip=y; vLit=env; vFog=1.-exp(-(-mv.z)*.1);
+        vTip=y; vLit=env; vFog=1.-exp(-(-mv.z)*.2); vNear=smoothstep(.5,2.4,-mv.z);
         gl_Position=projectionMatrix*mv;
       }`,
     fragmentShader: /* glsl */ `
-      varying float vTip,vLit,vFog;
+      varying float vTip,vLit,vFog,vNear;
       void main(){
-        vec3 c=mix(vec3(.05,.055,.06),vec3(.74,.72,.68),vTip*vTip);
+        vec3 c=mix(vec3(.02,.021,.025),vec3(.36,.35,.33),vTip*vTip)*(.25+.75*vNear);
         c=mix(c,vec3(1.,.42,.07)*2.4,vLit*vTip);
-        c=mix(c,vec3(.01,.012,.018),vFog);
+        c=mix(c,vec3(.004,.005,.008),vFog);
         gl_FragColor=vec4(c,1.);
       }`,
   })
   const mesh = new THREE.Mesh(g, m)
   mesh.frustumCulled = false
+  mesh.renderOrder = 2
   return { mesh, m }
 }
 
@@ -135,21 +139,40 @@ const node = (p: number, fov = 66) => {
 export async function buildSpiral(q: Quality): Promise<Built> {
   const scene = new THREE.Scene()
   scene.background = new THREE.Color('#010203')
-  scene.fog = new THREE.FogExp2('#020305', 0.1)
+  scene.fog = new THREE.FogExp2('#010203', 0.13)
 
-  const wall = new THREE.Mesh(tunnel(), pbr('rock', [1, 1], { color: '#47484f', roughness: 0.9, side: THREE.BackSide }))
+  const wall = new THREE.Mesh(tunnel(), pbr('wall', [1, 1], { color: '#26272c', roughness: 0.95, side: THREE.BackSide }))
   scene.add(wall)
+  // Ribs of old shuttering every couple of metres give the eye a rhythm to count, then lose count of.
+  const ribs = 96
+  const rib = new THREE.InstancedMesh(new THREE.TorusGeometry(1, 0.07, 6, 28), pbr('wall', [2, 0.2], { color: '#1c1c20', roughness: 1 }), ribs)
+  for (let i = 0; i < ribs; i++) {
+    const p = (i + 0.5) / ribs
+    const f = frame(p)
+    const R = tubeR(p)
+    const look = new THREE.Matrix4().makeBasis(f.side, f.up, f.t)
+    rib.setMatrixAt(i, look.scale(v3(R * 1.06, R * 0.92, 1)).setPosition(f.c.clone().addScaledVector(f.up, -R * 0.05)))
+  }
+  scene.add(rib)
   const w = wires(q)
   scene.add(w.mesh)
 
   // Two lamps only: one that follows the visitor at waist height and the orange trace of the passing wave.
-  const walk = new THREE.PointLight('#b9c3d6', 15, 11, 1.7)
+  const walk = new THREE.PointLight('#aeb8cc', 5, 9, 1.8)
   const trace = new THREE.PointLight('#ff6a00', 0, 9, 1.8)
-  scene.add(walk, trace, new THREE.HemisphereLight('#1a2030', '#000', 0.12))
+  scene.add(walk, trace, new THREE.HemisphereLight('#1a2030', '#000', 0.05))
 
   // The apex: a warm hole.
   const end = spiralAt(1)
-  const hole = new THREE.Mesh(new THREE.CircleGeometry(1.1, 32), new THREE.MeshBasicMaterial({ color: new THREE.Color('#ff7a26').multiplyScalar(5) }))
+  const hole = new THREE.Mesh(
+    new THREE.CircleGeometry(1.3, 48),
+    new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      vertexShader: /* glsl */ `varying vec2 vU; void main(){ vU=uv-.5; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
+      fragmentShader: /* glsl */ `varying vec2 vU; void main(){ float r=length(vU)*2.; float a=pow(1.-r,2.2); gl_FragColor=vec4(vec3(1.,.36,.06)*(.2+a*2.4),a); }`,
+    }),
+  )
   hole.position.copy(end)
   hole.lookAt(spiralAt(0.96))
   scene.add(hole)
@@ -203,7 +226,7 @@ export async function buildSpiral(q: Quality): Promise<Built> {
       camP = best
       walk.position.copy(live.cam.position).add(v3(0, 0.1, 0))
       trace.position.copy(spiralAt(clamp(gl.uWave.value)))
-      trace.intensity = 34
+      trace.intensity = 22
 
       // the walker: a place the wires refuse. Each footfall is an event the audio layer can place.
       if (walkerP >= 0) {

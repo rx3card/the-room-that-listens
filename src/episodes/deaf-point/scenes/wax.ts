@@ -6,6 +6,24 @@ import { canvasTexture, dust, lathe, model, pbr, sharedDispose, shadowed, v3, ty
 const R = 9.5 // the round room
 const H = 7.4
 
+// Every cylinder carries a paper band with a line of writing nobody will read from here.
+function labels() {
+  return canvasTexture(256, 128, c => {
+    c.fillStyle = '#fff'
+    c.fillRect(0, 0, 256, 128)
+    c.fillStyle = '#e9dcc0'
+    c.fillRect(0, 44, 256, 46)
+    c.strokeStyle = '#3a2c1c'
+    c.lineWidth = 2
+    for (let x = 12; x < 240; x += 58) {
+      c.beginPath()
+      c.moveTo(x, 62)
+      for (let i = 0; i < 9; i++) c.lineTo(x + i * 4, 58 + (i * 37) % 11)
+      c.stroke()
+    }
+  })
+}
+
 function hornProfile(): [number, number][] {
   const out: [number, number][] = []
   for (let i = 0; i <= 26; i++) {
@@ -38,7 +56,6 @@ function phonograph() {
   crank.add(arm, knob)
   crank.position.set(0.34, 0.15, 0)
   g.add(base, mandrel, carriage, horn, crank)
-  g.traverse(o => (o.castShadow = true))
   return { group: g, crank, mandrel }
 }
 
@@ -62,9 +79,9 @@ function membrane() {
       float vn(vec2 p){ vec2 i=floor(p),f=fract(p); f=f*f*(3.-2.*f); return mix(mix(n(i),n(i+vec2(1,0)),f.x),mix(n(i+vec2(0,1)),n(i+vec2(1,1)),f.x),f.y); }
       void main(){ float r=length(vP)/2.05;
         float v=vn(vP*3.)*.5+vn(vP*9.)*.3+vn(vP*vec2(2.,28.))*.2;
-        vec3 skin=mix(vec3(.11,.066,.04),vec3(.26,.17,.1),v);
-        vec3 light=vec3(1.,.55,.22)*(.08+uTaut*.14+uPush*2.4)*(1.-r*r)*(1.+v);
-        gl_FragColor=vec4(skin*(.34+uPush)+light,1.); }`,
+        vec3 skin=mix(vec3(.012,.0065,.004),vec3(.05,.027,.014),v);
+        vec3 light=vec3(1.,.5,.18)*(.004+uTaut*.03+uPush*2.2)*(1.-r*r)*(1.+v);
+        gl_FragColor=vec4(skin*(.8+uPush*3.)+light,1.); }`,
   })
   return { mesh: new THREE.Mesh(dense, m), uniforms }
 }
@@ -72,7 +89,7 @@ function membrane() {
 export async function buildWax(q: Quality): Promise<Built> {
   const scene = new THREE.Scene()
   scene.background = new THREE.Color('#030202')
-  scene.fog = new THREE.FogExp2('#0b0603', 0.045)
+  scene.fog = new THREE.FogExp2('#060302', 0.03)
 
   const wallMat = pbr('wall', [6, 2], { color: '#6b5f55', roughness: 1, side: THREE.BackSide })
   const wall = new THREE.Mesh(new THREE.CylinderGeometry(R, R, H, 72, 1, true), wallMat)
@@ -86,43 +103,52 @@ export async function buildWax(q: Quality): Promise<Built> {
 
   // Shelves ring the room, leaving gaps for the door side, the desk bay and the membrane.
   const shelfMat = pbr('plank', [2, 0.2], { color: '#5a4230', roughness: 0.7 })
-  const waxTube = new THREE.CylinderGeometry(0.034, 0.034, 0.1, 8)
-  const box = new THREE.CylinderGeometry(0.045, 0.045, 0.11, 8)
   const tiers = 9
-  const count = Math.min(9000, q.wires / 2)
-  const cyl = new THREE.InstancedMesh(waxTube, new THREE.MeshStandardMaterial({ roughness: 0.4, metalness: 0.05 }), count)
-  const carton = new THREE.InstancedMesh(box, new THREE.MeshStandardMaterial({ color: '#8c7350', roughness: 0.92 }), count)
-  const gap = (a: number) => Math.abs(a - Math.PI) < 0.5 || Math.abs(a) < 0.36 || Math.abs(a - Math.PI / 2) < 0.34
-  for (let t = 0; t < tiers; t++) {
-    const shelf = new THREE.Mesh(new THREE.TorusGeometry(R - 0.25, 0.26, 3, 72), shelfMat)
-    shelf.rotation.x = Math.PI / 2
-    shelf.scale.z = 0.12
-    shelf.position.y = 0.55 + t * 0.72
-    shelf.receiveShadow = true
-    scene.add(shelf)
-  }
+  const count = q.name === 'lite' ? 7500 : 16000
+  const cyl = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.056, 0.056, 0.15, 10), new THREE.MeshStandardMaterial({ roughness: 0.42, metalness: 0.05, map: labels() }), count)
+  // angles left clear: the door side, the desk bay, the relay and the membrane
+  const gap = (a: number) => Math.abs(a - Math.PI) < 0.3 || Math.abs(a) < 0.27 || Math.abs(a - Math.PI * 2) < 0.27 || Math.abs(a - Math.PI / 2) < 0.26
+  // shelves run between the bays, never across them
+  const arcs: [number, number][] = [[0.27, Math.PI / 2 - 0.53], [Math.PI / 2 + 0.26, Math.PI / 2 - 0.56], [Math.PI + 0.3, Math.PI - 0.57]]
+  for (let t = 0; t < tiers; t++)
+    for (const [from, len] of arcs) {
+      const shelf = new THREE.Mesh(new THREE.RingGeometry(R - 0.68, R, 48, 1, from, len).rotateX(Math.PI / 2), shelfMat)
+      shelf.position.y = 0.52 + t * 0.72
+      shelf.material.side = THREE.DoubleSide
+      shelf.receiveShadow = true
+      scene.add(shelf)
+    }
+  const uprights = 34
+  const upright = new THREE.InstancedMesh(new THREE.BoxGeometry(0.68, 7, 0.09), shelfMat, uprights)
   const m = new THREE.Matrix4(), c = new THREE.Color()
-  const palette = ['#7c4a20', '#5e3518', '#94632b', '#3f2412', '#a8772f']
-  let n = 0
-  for (let i = 0; n < count && i < count * 6; i++) {
-    const a = Math.random() * Math.PI * 2
-    if (gap(a) && Math.random() > 0.08) continue
-    const tier = Math.floor(Math.random() * tiers)
-    const r = R - 0.08 - Math.random() * 0.42
-    const y = 0.61 + tier * 0.72 + Math.floor(Math.random() * 3) * 0.13
-    m.makeRotationY(-a).setPosition(Math.cos(a) * r, y, Math.sin(a) * r)
-    cyl.setMatrixAt(n, m)
-    cyl.setColorAt(n, c.set(palette[Math.floor(Math.random() * palette.length)]).multiplyScalar(0.6 + Math.random() * 0.7))
-    carton.setMatrixAt(n, m.setPosition(Math.cos(a) * (r + 0.08), y, Math.sin(a) * (r + 0.08)))
-    n++
+  for (let i = 0; i < uprights; i++) {
+    const a = (i / uprights) * Math.PI * 2
+    m.makeRotationY(-a).setPosition(Math.cos(a) * (R - 0.32), 3.5, Math.sin(a) * (R - 0.32))
+    upright.setMatrixAt(i, gap(a) ? new THREE.Matrix4().makeScale(0, 0, 0) : m)
   }
-  cyl.count = carton.count = n
-  scene.add(cyl, carton)
+  scene.add(upright)
+  const palette = ['#6e3f1a', '#54301a', '#8a5a26', '#3b2110', '#9a6c2a', '#8c7350']
+  let n = 0
+  let seq = 0
+  const rng = (i: number) => Math.abs(Math.sin(i * 12.9898) * 43758.5453) % 1 // same room on every visit
+  for (let t = 0; t < tiers && n < count; t++)
+    for (const r of q.name === 'lite' ? [R - 0.3] : [R - 0.2, R - 0.42])
+      for (let a = 0; a < Math.PI * 2 && n < count; a += 0.122 / r) {
+        const k = ++seq
+        if (gap(a) || rng(k) < 0.07) continue
+        const lift = rng(k + 3) < 0.35 ? 0.16 : 0
+        m.makeRotationY(rng(k + 1) * 3).setPosition(Math.cos(a) * r, 0.61 + t * 0.72 + lift, Math.sin(a) * r)
+        cyl.setMatrixAt(n, m)
+        cyl.setColorAt(n, c.set(palette[Math.floor(rng(k + 2) * palette.length)]).multiplyScalar(0.55 + rng(k + 4) * 0.7))
+        n++
+      }
+  cyl.count = n
+  scene.add(cyl)
 
   // The table at the centre of the room.
   const top = new THREE.Mesh(new THREE.CylinderGeometry(1.3, 1.3, 0.07, 48), pbr('plank', [1, 1], { color: '#4b2f1c', roughness: 0.45 }))
   top.position.y = 0.92
-  top.castShadow = top.receiveShadow = true
+  top.receiveShadow = true // the table's own shadow reads as a rug from this height
   const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.34, 0.9, 16), pbr('plank', [1, 1], { color: '#2f1e13' }))
   leg.position.y = 0.45
   scene.add(top, leg)
@@ -137,7 +163,7 @@ export async function buildWax(q: Quality): Promise<Built> {
   lampS.scale.setScalar(1.2)
   scene.add(lampS)
 
-  const lamp = shadowed(new THREE.PointLight('#ffa050', 52, 26, 1.5), q, 0.1, 26)
+  const lamp = shadowed(new THREE.PointLight('#ffa35a', 46, 28, 1.45), q, 0.1, 26)
   lamp.position.set(-0.68, 1.36, -0.34)
   scene.add(lamp)
   const flame = new THREE.Mesh(new THREE.SphereGeometry(0.03, 12, 8), new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffb36b').multiplyScalar(22) }))
@@ -181,7 +207,7 @@ export async function buildWax(q: Quality): Promise<Built> {
   cut.position.set(0.58, 0.79, 7.96)
   cut.rotation.y = -0.15
   scene.add(ledger, notebook, cut)
-  const bay = new THREE.PointLight('#ff9a4c', 2.6, 6, 1.7)
+  const bay = new THREE.PointLight('#ff9a4c', 1.1, 5, 1.8)
   bay.position.set(0.2, 1.7, 7.4)
   scene.add(bay)
 
@@ -205,7 +231,7 @@ export async function buildWax(q: Quality): Promise<Built> {
   const relayPanel = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1.9, 2.1), pbr('rust', [1, 1], { color: '#403028', metalness: 0.4, roughness: 0.9 }))
   relayPanel.position.set(-R + 0.14, 2, 0)
   scene.add(relayPanel)
-  const relayLight = new THREE.PointLight('#ff9a4c', 2.4, 5, 1.7)
+  const relayLight = new THREE.PointLight('#ff9a4c', 1.2, 4, 1.8)
   relayLight.position.set(-R + 1.6, 2.5, 0)
   scene.add(relayLight)
 
@@ -224,7 +250,7 @@ export async function buildWax(q: Quality): Promise<Built> {
   hatch.position.set(-5.8, H + 0.7, 0)
   scene.add(hatch)
 
-  scene.add(new THREE.HemisphereLight('#3a2413', '#0a0502', 0.32))
+  scene.add(new THREE.HemisphereLight('#4a2e18', '#0a0502', 0.5))
   const motes = dust(q, v3(0, 2, 0), 7, '#ffae66', 0.014)
   scene.add(motes)
 
@@ -237,12 +263,12 @@ export async function buildWax(q: Quality): Promise<Built> {
 
   const b: Built = {
     scene,
-    exposure: 1.05,
-    bloom: 0.55,
+    exposure: 1.7,
+    bloom: 0.3,
     nodes: {
       top: { pos: v3(-5.8, H + 1.8, 0), look: v3(-1, 0.8, 0), fov: 60 },
       floor: { pos: v3(-4.6, 1.6, -3.3), look: v3(0.2, 1.3, 0.3), fov: 58, range: [1.5, 0.45] },
-      shelf: { pos: v3(2.2, 1.6, -6.9), look: v3(3.1, 1.9, -9.2), fov: 46, range: [0.5, 0.3] },
+      shelf: { pos: v3(1.6, 1.6, -5.2), look: v3(3.4, 2.1, -9.2), fov: 40, range: [0.5, 0.3] },
       phonograph: { pos: v3(1.2, 1.55, 1.55), look: v3(0.1, 1.15, 0.1), fov: 38, range: [0.25, 0.15] },
       desk: { pos: v3(0.05, 1.68, 6.5), look: v3(0.05, 0.75, 7.9), fov: 42, range: [0.4, 0.25] },
       relay: { pos: v3(-6.6, 1.75, 0), look: v3(-9.2, 1.8, 0), fov: 42, range: [0.3, 0.2] },
@@ -271,11 +297,12 @@ export async function buildWax(q: Quality): Promise<Built> {
       'cyl.vale': v3(4.0, 1.35, -8.5),
       'cyl.blank': v3(5.0, 1.75, -8),
     },
+    light: () => flick,
     update(t, dt, live: Live) {
       ;(motes.material as THREE.ShaderMaterial).uniforms.uT.value = t
       const target = 1 + Math.sin(t * 7.3) * 0.05 + Math.sin(t * 13.1) * 0.03 + Math.sin(t * 2.3) * 0.06
       flick += (target - flick) * Math.min(1, dt * 14)
-      lamp.intensity = 52 * flick * (1 - live.lean * 0.4)
+      lamp.intensity = 46 * flick * (1 - live.lean * 0.4)
       flame.scale.y = 1.8 + (flick - 1) * 3
       spin += turning * dt * 9
       ph.crank.rotation.x = spin

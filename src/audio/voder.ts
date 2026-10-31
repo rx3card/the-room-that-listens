@@ -66,14 +66,15 @@ export function speak(text: string, sr = 22050, pitch = 104, seed = 1): Float32A
   let v = 0
   let n = 0
   let t = 0
-
   const bws = [90, 110, 170]
+  let coef = [0, 1, 2].map(k => resonator(f[k], bws[k], sr))
   for (const p of seq) {
     const len = Math.floor((p ? p.d * 1.5 : 0.14) * sr)
     const nCoef = p ? Math.min(0.9, (2 * Math.PI * p.nf) / sr) : 0.1
     for (let i = 0; i < len && t < out.length; i++, t++) {
       const ease = 0.0016
       if (p) for (let k = 0; k < 3; k++) f[k] += (p.f[k] - f[k]) * ease
+      if (t % 32 === 0) coef = [0, 1, 2].map(k => resonator(f[k], bws[k], sr)) // formants move slowly
       v += ((p?.v ?? 0) - v) * 0.0035
       n += ((p?.n ?? 0) - n) * 0.008
 
@@ -87,7 +88,7 @@ export function speak(text: string, sr = 22050, pitch = 104, seed = 1): Float32A
       const src = glottal * v
       let s = 0
       for (let k = 0; k < 3; k++) {
-        const { a, b, c } = resonator(f[k], bws[k], sr)
+        const { a, b, c } = coef[k]
         const y = a * src + b * y1[k] + c * y2[k]
         y2[k] = y1[k]
         y1[k] = y

@@ -1,11 +1,13 @@
 import * as THREE from 'three'
 import type { Quality } from '../../../core/quality'
-import { canvasTexture, dust, lathe, model, sharedDispose, shadowed, sky, v3, type Built, type Live } from '../../../render/kit'
+import { canvasTexture, dust, fbm, lathe, model, sharedDispose, shadowed, sky, v3, type Built, type Live } from '../../../render/kit'
 
 interface Part {
   geometry: THREE.BufferGeometry
   material: THREE.Material
 }
+
+const smoothEdge = (x: number) => { const t = Math.min(1, Math.max(0, x)); return t * t * t }
 
 const seat = (i: number) => {
   // forty-one chairs in loose ranks, all facing the water and the dawn
@@ -16,9 +18,9 @@ const seat = (i: number) => {
 
 export async function buildOther(q: Quality, fallen: number[]): Promise<Built> {
   const scene = new THREE.Scene()
-  scene.fog = new THREE.FogExp2('#12091a', 0.0125)
+  scene.fog = new THREE.FogExp2('#0b0512', 0.009)
 
-  const dome = sky({ zenith: '#0a0612', horizon: '#261231', glow: '#b23a2a', glowDir: v3(0, 0.02, -1), glowSize: 34, stars: 0, clouds: 0.5, mirror: true })
+  const dome = sky({ zenith: '#07040e', horizon: '#261231', glow: '#c23320', glowDir: v3(0.1, 0.0, -1), glowSize: 60, stars: 0, clouds: 0.75, mirror: true })
   scene.add(dome)
 
   const [chairS, lampS, deskS, radioS] = await Promise.all([model('chair'), model('hanging-lamp'), model('desk'), model('radio')])
@@ -44,7 +46,11 @@ export async function buildOther(q: Quality, fallen: number[]): Promise<Built> {
   }
   for (const p of parts) {
     const up = new THREE.InstancedMesh(p.geometry, p.material, 41)
-    const down = new THREE.InstancedMesh(p.geometry, p.material, 41)
+    // water is darker than air: the reflection gets its own dimmed copy of the paint
+    const dim = (p.material as THREE.MeshStandardMaterial).clone()
+    dim.color.multiplyScalar(0.3)
+    dim.side = THREE.DoubleSide
+    const down = new THREE.InstancedMesh(p.geometry, dim, 41)
     for (let i = 0; i < 41; i++) {
       up.setMatrixAt(i, place(i))
       down.setMatrixAt(i, new THREE.Matrix4().multiplyMatrices(mirror, m4))
@@ -67,7 +73,7 @@ export async function buildOther(q: Quality, fallen: number[]): Promise<Built> {
           vec3 V=normalize(cameraPosition-vW);
           float f=pow(1.-max(V.y,0.),3.);
           float r=sin(length(vW.xz)*.8-uT*.3)*.5+.5;
-          float a=mix(.62,.2,f)+r*.015;
+          float a=mix(.78,.34,f)+r*.015;
           gl_FragColor=vec4(.008,.006,.014,a);
         }`,
     }),
@@ -83,17 +89,26 @@ export async function buildOther(q: Quality, fallen: number[]): Promise<Built> {
     g.add(c)
     scene.add(o, g)
   }
-  const cliff = new THREE.Mesh(new THREE.CylinderGeometry(70, 110, 34, 7).translate(0, 17, 0), cliffMat)
-  cliff.position.set(-84, 0, -150)
-  cliff.scale.z = 0.5
+  const cliffG = new THREE.PlaneGeometry(420, 120, 200, 70)
+  const cp = cliffG.attributes.position as THREE.BufferAttribute
+  for (let i = 0; i < cp.count; i++) {
+    const x = cp.getX(i), y = cp.getY(i) + 60
+    const edge = 1 - smoothEdge(Math.abs(x + 20) / 190)
+    const top = 34 + (fbm(x * 0.03, 3, 4) - 0.5) * 12
+    cp.setY(i, Math.min(y, top + (fbm(x * 0.2, y * 0.2, 3) - 0.5) * 3) * edge)
+    cp.setZ(i, (fbm(x * 0.05, y * 0.05, 3) - 0.5) * 16)
+  }
+  cliffG.computeVertexNormals()
+  const cliff = new THREE.Mesh(cliffG, cliffMat)
+  cliff.position.set(-60, 0, -170)
   addBoth(cliff)
   const dish = lathe(Array.from({ length: 14 }, (_, i) => [1 + i * 1.1, (1 + i * 1.1) ** 2 / 36] as [number, number]), 48, new THREE.MeshStandardMaterial({ color: '#0a070c', side: THREE.DoubleSide }))
   dish.rotation.x = -Math.PI / 2 + 0.05
   dish.rotation.z = 0.15
-  dish.position.set(-80, 48, -146)
+  dish.position.set(-58, 37, -168)
   addBoth(dish)
   const pupil = new THREE.Mesh(new THREE.CircleGeometry(1.1, 24), new THREE.MeshBasicMaterial({ color: new THREE.Color('#ff7a26').multiplyScalar(2.2) }))
-  pupil.position.set(-80, 48, -145.4)
+  pupil.position.set(-58, 37, -167.4)
   scene.add(pupil)
 
   // The desk stands in the water at the middle of the ranks.
@@ -134,24 +149,24 @@ export async function buildOther(q: Quality, fallen: number[]): Promise<Built> {
   lampS.scale.setScalar(0.7)
   lampS.position.set(0.5, 1.9, 13.2)
   scene.add(stand, lampS)
-  const lampLight = shadowed(new THREE.SpotLight('#ffaa55', 110, 22, 1.2, 0.8, 1.7), q, 0.3, 24)
+  const lampLight = shadowed(new THREE.SpotLight('#ffaa55', 46, 22, 1.25, 0.8, 1.7), q, 0.3, 24)
   lampLight.position.set(0.5, 1.95, 13.2)
   lampLight.target.position.set(0.1, 0.7, 13)
   scene.add(lampLight, lampLight.target)
 
-  const rim = new THREE.DirectionalLight('#c04a34', 1.5)
+  const rim = new THREE.DirectionalLight('#d0553a', 2.6)
   rim.position.set(0, 4, -80)
-  scene.add(rim, new THREE.HemisphereLight('#41204f', '#0a0410', 0.5))
+  scene.add(rim, new THREE.HemisphereLight('#3a1a4a', '#070310', 1))
   const motes = dust(q, v3(0, 2, 14), 12, '#c9988a', 0.012)
   scene.add(motes)
 
   return {
     scene,
-    exposure: 1.1,
-    bloom: 0.75,
+    exposure: 1.5,
+    bloom: 0.55,
     nodes: {
       high: { pos: v3(0, 70, 38), look: v3(0, 0, -30), fov: 62 },
-      shore: { pos: v3(-1.5, 1.6, 34), look: v3(0, 1.1, -10), fov: 48, range: [0.9, 0.3] },
+      shore: { pos: v3(-1.5, 1.3, 27.5), look: v3(0, 1.5, -20), fov: 46, range: [0.9, 0.3] },
       rows: { pos: v3(1.6, 1.6, 21), look: v3(0.2, 0.9, 12), fov: 52, range: [1.1, 0.35] },
       desk: { pos: v3(0.1, 1.62, 14.25), look: v3(0.1, 0.92, 12.9), fov: 44, range: [0.6, 0.3] },
     },
@@ -165,7 +180,7 @@ export async function buildOther(q: Quality, fallen: number[]): Promise<Built> {
       ;(dome.material as THREE.ShaderMaterial).uniforms.uT.value = t
       ;(water.material as THREE.ShaderMaterial).uniforms.uT.value = t
       ;(motes.material as THREE.ShaderMaterial).uniforms.uT.value = t
-      lampLight.intensity = (1 - live.lean * 0.6) * 110
+      lampLight.intensity = (1 - live.lean * 0.6) * 46
     },
     event() {},
     dispose() {

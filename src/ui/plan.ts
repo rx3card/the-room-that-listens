@@ -19,7 +19,7 @@ export function planSvg() {
     <path class="void" d="M170 142 C232 160 232 280 170 300 C150 262 150 180 170 142Z" />
     <path class="void" d="M228 214 C290 226 360 232 412 236 L420 268 C360 258 290 252 228 246Z" />
     <path class="void" d="M428 226 C440 196 472 170 500 186 C528 200 526 232 498 244 C470 254 436 262 430 276Z" />
-    <path class="void" d="M532 250 C574 226 640 240 648 292 C654 340 590 360 556 330 C530 306 560 268 596 282 C624 294 616 326 590 324 C572 322 574 300 590 300" stroke-width="26" fill="none" />
+    <path class="canal" d="M532 250 C574 226 640 240 648 292 C654 340 590 360 556 330 C530 306 560 268 596 282 C624 294 616 326 590 324 C572 322 574 300 590 300" />
     <path class="skin" d="M420 228 L428 280" />
     <path class="bone" d="M444 214 L470 196 M470 196 L486 232 M486 232 L528 248" />
     ${label(30, 320, 'plan.sea')}${label(150, 128, 'plan.mirror')}${label(280, 216, 'plan.gallery')}${label(392, 306, 'plan.membrane')}${label(462, 170, 'plan.relay')}${label(620, 214, 'plan.spiral')}

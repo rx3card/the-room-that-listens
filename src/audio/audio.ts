@@ -170,6 +170,27 @@ export class AudioEngine {
     return { gain: g, layer: this.fadeOut(g, nodes) }
   }
 
+  /** A recording as an ambient layer. The gain exists at once, so it can be faded before the file arrives. */
+  private loop(rel: string, level: number, opts: { rate?: number; dest?: AudioNode; fade?: number } = {}) {
+    const ctx = this.ctx!
+    const g = ctx.createGain()
+    g.gain.value = 0
+    g.gain.setTargetAtTime(level, ctx.currentTime, opts.fade ?? 3)
+    g.connect(opts.dest ?? this.amb)
+    const nodes: { stop(t?: number): void }[] = []
+    void this.file(rel).then(b => {
+      if (!b) return
+      const s = ctx.createBufferSource()
+      s.buffer = b
+      s.loop = true
+      s.playbackRate.value = opts.rate ?? 1
+      s.connect(g)
+      s.start()
+      nodes.push(s)
+    })
+    return { gain: g, layer: this.fadeOut(g, nodes) }
+  }
+
   /** A slow beating drone. Detuned sines, never a melody. */
   private drone(freqs: number[], level: number, type: OscillatorType = 'sine', cutoff = 500) {
     const ctx = this.ctx!
@@ -260,47 +281,43 @@ export class AudioEngine {
 
   ambience(name: Ambience) {
     if (!this.ctx) return
-    const ctx = this.ctx
     for (const l of this.layers) l.stop(2.5)
     this.layers = []
     this.sea = undefined
     const add = (l: Layer) => this.layers.push(l)
     if (name === 'sea') {
       this.setRoom('deaf')
-      const s = this.surf(0.55)
+      const s = this.loop('audio/sea.mp3', 0.8)
       this.sea = s.gain
       add(s.layer)
+      add(this.surf(0.12).layer)
       add(this.wind(0.1))
     } else if (name === 'hall') {
       this.setRoom('deaf')
       add(this.drone([41, 61.7], 0.1))
-      add(this.rainOn(0.012))
+      add(this.rainOn(0.006))
+      add(this.loop('audio/rain.mp3', 0.5).layer)
       this.tick('hum', 50)
     } else if (name === 'wax') {
       this.setRoom('wax')
       add(this.drone([55, 82.4, 110.5], 0.05, 'triangle', 240))
+      add(this.loop('audio/music-feeling-watched.mp3', 0.2, { fade: 6 }).layer)
+      // real voices from 1890 behind the shelves, too quiet to make out
+      add(this.loop('audio/cylinder-1890.mp3', 0.16, { dest: this.panner('shelves', 6, 2, -7) }).layer)
     } else if (name === 'spiral') {
       this.setRoom('spiral')
-      add(this.drone([36.7, 73.6, 146.8], 0.1, 'sine', 900))
+      add(this.drone([36.7, 73.6, 146.8], 0.08, 'sine', 900))
       add(this.tonotopic())
+      add(this.loop('audio/music-sensory-deprivation.mp3', 0.22, { fade: 6 }).layer)
     } else if (name === 'other') {
       this.setRoom('other')
       add(this.drone([32.7, 49], 0.12))
-      void this.file('audio/wind-mars.mp3').then(b => {
-        if (!b || !this.ctx) return
-        const s = ctx.createBufferSource()
-        s.buffer = b
-        s.loop = true
-        s.playbackRate.value = 0.7
-        const g = ctx.createGain()
-        g.gain.value = 0
-        g.gain.setTargetAtTime(0.5, ctx.currentTime, 4)
-        s.connect(g).connect(this.amb)
-        s.start()
-        this.layers.push(this.fadeOut(g, [s]))
-      })
+      add(this.loop('audio/wind-mars.mp3', 0.5, { rate: 0.7, fade: 4 }).layer)
+      add(this.loop('audio/music-perceptual-isolation.mp3', 0.26, { fade: 8 }).layer)
     } else if (name === 'last') {
       add(this.drone([65.4], 0.035))
+      // the oldest recorded voice there is, a recording never meant to be played
+      add(this.loop('audio/phonautogram-1860.mp3', 0.12, { rate: 0.6, fade: 8 }).layer)
     }
   }
 
@@ -426,13 +443,27 @@ export class AudioEngine {
   seaReturns() {
     if (!this.ctx) return
     for (const l of this.layers) l.stop(1.5)
-    this.layers = [this.surf(0.5).layer]
+    this.layers = [this.loop('audio/sea.mp3', 0.9, { fade: 4 }).layer]
     this.setRoom('deaf')
   }
 
   /** Listening cups: muffles the world, as the visitor sits at the focus. */
   setCups(on: boolean) {
-    this.cups?.frequency.setTargetAtTime(on ? 1100 : 20000, this.ctx!.currentTime, 0.2)
+    if (!this.ctx) return
+    this.cups.frequency.setTargetAtTime(on ? 1100 : 20000, this.ctx.currentTime, 0.2)
+    if (on) this.line = this.loop('audio/cylinder-1888.mp3', 0.5, { fade: 1 }).layer
+    else this.line?.stop(1)
+  }
+
+  private line?: Layer
+
+  /** Real footsteps on a spiral stair, placed in the dark ahead of the visitor. */
+  footfalls(x: number, y: number, z: number) {
+    if (this.ctx) this.layers.push(this.loop('audio/steps-spiral.mp3', 1.4, { dest: this.panner('walker', x, y, z), fade: 1 }).layer)
+  }
+
+  sample(rel: string, gain = 0.5) {
+    void this.playFile(rel, gain)
   }
 
   private file(rel: string) {

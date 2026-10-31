@@ -8,6 +8,7 @@ export interface CamNode {
   look: THREE.Vector3
   fov?: number
   range?: [number, number] // yaw, pitch freedom in radians
+  exposure?: number // this vantage's own stop, for when a lamp is close
 }
 
 export interface Live {
@@ -23,6 +24,8 @@ export interface Built {
   anchors: Record<string, THREE.Vector3>
   exposure: number
   bloom: number
+  /** Live brightness of this place's main lamp, so a painted plate can flicker with it. */
+  light?: () => number
   update(t: number, dt: number, live: Live): void
   event(name: string, data?: unknown): void
   dispose(): void
@@ -109,6 +112,7 @@ export function dust(q: Quality, center: THREE.Vector3, radius: number, color: T
   })
   const p = new THREE.Points(g, m)
   p.frustumCulled = false
+  p.renderOrder = 2
   return p
 }
 
@@ -129,7 +133,9 @@ export function beam(height: number, radius: number, color: THREE.ColorRepresent
       uniform vec3 uC; uniform float uS; varying vec3 vN, vV; varying float vY;
       void main(){ float f=pow(abs(dot(normalize(vN),normalize(vV))),2.6); gl_FragColor=vec4(uC, f*uS*pow(1.-vY,1.7)); }`,
   })
-  return new THREE.Mesh(g, m)
+  const mesh = new THREE.Mesh(g, m)
+  mesh.renderOrder = 2
+  return mesh
 }
 
 /** Night or dawn dome. Symmetric below the horizon so still water can show it. */

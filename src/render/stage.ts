@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { BlendFunction, BloomEffect, Effect, EffectComposer, EffectPass, RenderPass } from 'postprocessing'
+import { N8AOPostPass } from 'n8ao'
 import { clamp, inOut, lerp, smooth, Tweens } from '../core/tween'
 import { quality, type Quality, type QualityName } from '../core/quality'
 import type { Built, CamNode, Live } from './kit'
@@ -17,12 +18,15 @@ class Grade extends Effect {
         vec3 c=inputColor.rgb;
         if(uFringe>0.){ vec2 o=(uv-.5)*uFringe*.012; c.r=texture2D(inputBuffer,uv+o).r; c.b=texture2D(inputBuffer,uv-o).b; }
         c*=uExposure;
-        vec2 q=uv-.5; c*=1.-dot(q,q)*1.15;
+        vec2 q=uv-.5; c*=1.-dot(q,q)*1.3;
+        // print stock: cool, slightly lifted shadows, warm highlights
+        float l=dot(c,vec3(.2126,.7152,.0722));
+        c=mix(c,c*vec3(.86,.96,1.08)+vec3(.0016,.0022,.0034),smoothstep(.22,.0,l));
+        c=mix(c,c*vec3(1.05,1.,.93),smoothstep(.2,.9,l));
         c+=vec3(1.,.42,.1)*uLeak*smoothstep(.2,1.,uv.x)*.2;
         c=aces(c);
-        c=pow(c,vec3(1./2.2));
-        float g=r(uv*vec2(1920.,1080.)+uTime*61.)-.5;
-        c+=g*(.018+uGrain*.09)*(1.-dot(c,vec3(.33))*.6);
+        float g=r(gl_FragCoord.xy*.731+fract(uTime*7.13)*97.)-.5;
+        c+=g*(.012+uGrain*.07)*(1.-dot(c,vec3(.33))*.6);
         outputColor=vec4(c,1.);
       }`,
       {
@@ -41,6 +45,10 @@ class Grade extends Effect {
     this.uniforms.get(name)!.value = v
   }
 }
+
+// References are shot this much wider than a node's field of view, in ChatGPT's 3:2, so a plate covers any screen.
+export const PLATE_FOV = 1.3
+export const PLATE_ASPECT = 1.5
 
 export class Stage {
   renderer: THREE.WebGLRenderer
@@ -61,12 +69,17 @@ export class Stage {
   private composer!: EffectComposer
   private pass!: RenderPass
   private grade!: Grade
+  private ao?: N8AOPostPass
+  private plates = new Map<string, THREE.Texture | null>()
+  private plate?: THREE.Mesh
+  private stageId = ''
   private bloom?: BloomEffect
   private t = 0
   private last = 0
   private pos = new THREE.Vector3()
   private target = new THREE.Vector3()
   private node?: CamNode
+  private nodeExposure = 1
   private yaw = 0
   private pitch = 0
   private yawT = 0
@@ -97,6 +110,16 @@ export class Stage {
     this.composer = new EffectComposer(this.renderer, { frameBufferType: THREE.HalfFloatType, multisampling: this.q.msaa })
     this.pass = new RenderPass(this.built?.scene ?? new THREE.Scene(), this.camera)
     this.composer.addPass(this.pass)
+    // contact shadows are most of what separates a lit scene from a game engine default
+    this.ao = this.q.bloom ? new N8AOPostPass(this.built?.scene ?? new THREE.Scene(), this.camera, innerWidth, innerHeight) : undefined
+    if (this.ao) {
+      this.ao.configuration.aoRadius = 1.6
+      this.ao.configuration.distanceFalloff = 0.8
+      this.ao.configuration.intensity = 3.2
+      this.ao.configuration.gammaCorrection = false
+      this.ao.setQualityMode(this.q.name === 'cinematic' ? 'Medium' : 'Performance')
+      this.composer.addPass(this.ao)
+    }
     this.grade = new Grade()
     this.bloom = this.q.bloom ? new BloomEffect({ luminanceThreshold: 0.55, luminanceSmoothing: 0.4, intensity: 0.7, mipmapBlur: true, radius: 0.75 }) : undefined
     this.composer.addPass(new EffectPass(this.camera, ...(this.bloom ? [this.bloom] : []), this.grade))
@@ -142,7 +165,7 @@ export class Stage {
         this.yawT += (-(e.clientX / innerWidth - 0.5) * 0.2 - this.yawT) * 0.04
         this.pitchT += (-(e.clientY / innerHeight - 0.5) * 0.12 - this.pitchT) * 0.04
       }
-      const range = this.node?.range ?? [0.7, 0.4]
+      const range = this.plate ? [0.14, 0.08] : (this.node?.range ?? [0.7, 0.4]) // a plate has a finite edge
       this.yawT = clamp(this.yawT, -range[0], range[0])
       this.pitchT = clamp(this.pitchT, -range[1], range[1])
     })
@@ -157,10 +180,13 @@ export class Stage {
     })
   }
 
-  setBuilt(b: Built, node?: string) {
+  setBuilt(b: Built, node?: string, name = '') {
     this.built?.dispose()
     this.built = b
+    this.stageId = name
+    this.plate = undefined
     this.pass.mainScene = b.scene
+    if (this.ao) this.ao.scene = b.scene
     if (node) this.jump(node)
     if (this.bloom) this.bloom.intensity = b.bloom
   }
@@ -173,6 +199,49 @@ export class Stage {
     this.camera.fov = n.fov ?? 50
     this.camera.updateProjectionMatrix()
     this.yaw = this.yawT = this.pitch = this.pitchT = 0
+    this.showPlate(node)
+  }
+
+  /**
+   * Matte painting. public/assets/plates/<stage>-<node>.webp, if it exists, is hung in the world in front of a node,
+   * painted from a reference of this exact view (tools/plates.mjs). It covers the 3D; live light, dust and rain stay on top.
+   */
+  private async showPlate(name: string) {
+    this.hidePlate(0.4)
+    const b = this.built
+    const n = b?.nodes[name]
+    if (!b || !n) return
+    const url = `${import.meta.env.BASE_URL}assets/plates/${this.stageId}-${name}.webp`
+    const key = url
+    let tex = this.plates.get(key)
+    if (tex === undefined) {
+      tex = await new THREE.TextureLoader().loadAsync(url).catch(() => null)
+      if (tex) tex.colorSpace = THREE.SRGBColorSpace
+      this.plates.set(key, tex)
+    }
+    if (!tex || this.built !== b || this.node !== n) return
+    const d = 8
+    const h = 2 * d * Math.tan(THREE.MathUtils.degToRad(((n.fov ?? 50) * PLATE_FOV) / 2))
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(h * PLATE_ASPECT, h), new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0, depthTest: false, depthWrite: false, fog: false }))
+    mesh.position.copy(n.pos).add(n.look.clone().sub(n.pos).normalize().multiplyScalar(d))
+    mesh.lookAt(n.pos)
+    mesh.renderOrder = 1
+    b.scene.add(mesh)
+    this.plate = mesh
+    void this.tweens.to(1.2, k => ((mesh.material as THREE.MeshBasicMaterial).opacity = k))
+  }
+
+  private hidePlate(dur: number) {
+    const m = this.plate
+    if (!m) return
+    this.plate = undefined
+    const mat = m.material as THREE.MeshBasicMaterial
+    const from = mat.opacity
+    void this.tweens.to(dur, k => (mat.opacity = from * (1 - k))).then(() => {
+      m.removeFromParent()
+      m.geometry.dispose()
+      mat.dispose()
+    })
   }
 
   async moveTo(name: string, dur = 3.2) {
@@ -185,6 +254,7 @@ export class Stage {
       await this.fadeTo(1, 0.4)
       return
     }
+    this.hidePlate(0.5)
     const p0 = this.pos.clone(), l0 = this.target.clone(), f0 = this.camera.fov
     const yaw0 = this.yawT, pitch0 = this.pitchT
     this.node = n
@@ -198,6 +268,7 @@ export class Stage {
       this.yawT = yaw0 * (1 - e)
       this.pitchT = pitch0 * (1 - e)
     })
+    void this.showPlate(name)
   }
 
   /** Authored flight along a spline, used for the arrival and the descents. */
@@ -256,7 +327,9 @@ export class Stage {
     const b = this.built
     if (b) {
       b.update(this.t, dt, this.live)
-      this.grade.set('uExposure', b.exposure * this.fade)
+      if (this.plate) (this.plate.material as THREE.MeshBasicMaterial).color.setScalar((b.light?.() ?? 1) * 0.72)
+      this.nodeExposure += ((this.node?.exposure ?? 1) - this.nodeExposure) * Math.min(1, dt * 1.5)
+      this.grade.set('uExposure', b.exposure * this.nodeExposure * this.fade)
       this.grade.set('uGrain', this.grain + this.live.lean * 0.5)
       this.grade.set('uFringe', this.fringe + this.live.lean * 0.8)
       this.grade.set('uLeak', this.leak)

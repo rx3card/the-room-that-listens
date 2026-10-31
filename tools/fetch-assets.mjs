@@ -33,7 +33,20 @@ const COMMONS = [
   ['audio', 'Tchaikowsky & Anton Rubinstein & friends(1890).ogg', 'audio/cylinder-1890.mp3'],
   ['audio', 'Arthur Sullivan - wax cylinder recording.ogg', 'audio/cylinder-1888.mp3'],
   ['audio', "Perseverance rover's SuperCam records wind on Mars.oga", 'audio/wind-mars.mp3'],
+  ['audio', 'Sea waves.wav', 'audio/sea.mp3'],
+  ['audio', 'Rain on a veranda and t.ogg', 'audio/rain.mp3'],
+  ['audio', 'Pasos en escalera de caracol.ogg', 'audio/steps-spiral.mp3'],
+  ['audio', 'Rusty metal door clasp.ogg', 'audio/clasp.mp3'],
+  ['audio', 'Metal cabinet door jarring.ogg', 'audio/cabinet.mp3'],
 ]
+
+// Music from SINIUS, The Silence Before the Haunting (CC BY 4.0, Free Music Archive). Used as a low bed, first 150 s.
+const MUSIC = {
+  "feeling-watched": "https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/p70DC0io1gFZvmxmtx2cD4wdLvJIozabSwojDsIc.mp3",
+  "perceptual-isolation": "https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/Ax24J4CA2KvIYdMa9fw5hfNcUC0FztOtZ9W8xUHi.mp3",
+  "sensory-deprivation": "https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/dWGcAmauxEbFd1dTD03fdQVAqmnWCCbi7uslNSTj.mp3"
+}
+
 
 const run = (cmd, args) => execFileSync(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 1 << 24 })
 const ensure = p => mkdirSync(dirname(p), { recursive: true })
@@ -50,6 +63,7 @@ async function get(url, path) {
 
 async function textures() {
   for (const [id, name] of Object.entries(TEXTURES)) {
+    if (done(join(OUT, 'tex', `${name}-rough.webp`))) continue
     const files = await (await fetch(`https://api.polyhaven.com/files/${id}`, { headers: { 'User-Agent': UA } })).json()
     const maps = { diff: ['Diffuse', 1024], nor: ['nor_gl', 1024], rough: ['Rough', 512] }
     for (const [key, [field, size]] of Object.entries(maps)) {
@@ -81,13 +95,15 @@ async function models() {
 
 async function commons() {
   for (const [kind, title, rel] of COMMONS) {
+    if (done(join(OUT, rel))) continue
+    await new Promise(r => setTimeout(r, 2500)) // Commons rate-limits anonymous bursts
     const api = new URL('https://commons.wikimedia.org/w/api.php')
     api.search = new URLSearchParams({ action: 'query', format: 'json', prop: 'imageinfo', iiprop: 'url', titles: `File:${title}` })
     const data = await (await fetch(api, { headers: { 'User-Agent': UA } })).json()
     const url = Object.values(data.query.pages)[0].imageinfo[0].url
+    await new Promise(r => setTimeout(r, 2500))
     const raw = await get(url, join(SRC, 'commons', title.replace(/[^\w.-]+/g, '_')))
     const out = join(OUT, rel)
-    if (done(out)) continue
     ensure(out)
     if (kind === 'audio') run('ffmpeg', ['-y', '-loglevel', 'error', '-i', raw, '-ac', '1', '-ar', '32000', '-b:a', '64k', out])
     else run('magick', [raw, out])
@@ -95,6 +111,17 @@ async function commons() {
   }
 }
 
+async function music() {
+  for (const [name, url] of Object.entries(MUSIC)) {
+    const raw = await get(url, join(SRC, 'music', `${name}.mp3`))
+    const out = join(OUT, 'audio', `music-${name}.mp3`)
+    if (done(out)) continue
+    run('ffmpeg', ['-y', '-loglevel', 'error', '-i', raw, '-t', '150', '-ac', '1', '-ar', '32000', '-b:a', '72k', out])
+    console.log('music', name)
+  }
+}
+
 await textures()
 await models()
 await commons()
+await music()

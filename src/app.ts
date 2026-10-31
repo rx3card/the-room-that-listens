@@ -65,7 +65,7 @@ export class App implements Host {
 
   constructor() {
     setLang(this.data.settings.lang ?? detectLang())
-    this.ui.append(this.spots, this.recordEl, this.voiceEl, this.layer, this.chrome)
+    this.ui.append(el('div', { cls: 'bars' }), this.spots, this.recordEl, this.voiceEl, this.layer, this.chrome)
     this.rec = new Transcript(s => this.showRecord(s))
     if (this.data.settings.reduced === undefined) this.data.settings.reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
     document.documentElement.classList.toggle('reduced', !!this.data.settings.reduced)
@@ -161,11 +161,11 @@ export class App implements Host {
 
   private fps(_q: QualityName) {}
 
-  private async ensureStage(name: string) {
+  async ensureStage(name: string) {
     if (!this.stage || this.stageName === name) return
     const built = await buildStage(name, this.stage, this.fallen())
     this.stageName = name
-    this.stage.setBuilt(built)
+    this.stage.setBuilt(built, undefined, name)
     built.event('walkerStep', () => {
       const p = this.stage?.camera.position
       if (p) this.audio.tick('step', p.x + 1.4, p.y - 1, p.z + 1.4)
@@ -208,12 +208,13 @@ export class App implements Host {
   private placeSpots() {
     const s = this.stage
     const a = s?.built?.anchors
-    if (!s || !a || this.spots.classList.contains('list')) return
+    if (!s || !a || this.spots.classList.contains('listed')) return
     for (const [id, node] of this.spotEls) {
       const p = a[id] ? s.project(a[id]) : null
       node.style.display = p ? '' : 'none'
       if (!p) continue
-      const x = clamp(p.x, 40, innerWidth - 40), y = clamp(p.y, 56, innerHeight - 40)
+      const bar = innerWidth > innerHeight ? clamp((innerHeight - innerWidth / 2.39) / 2, 0, innerHeight * 0.15) : 0
+      const x = clamp(p.x, 40, innerWidth - 40), y = clamp(p.y, bar + 28, innerHeight - bar - 28)
       node.style.transform = `translate(${x}px, ${y}px)`
       node.classList.toggle('flip', x > innerWidth - 240)
     }
@@ -224,14 +225,14 @@ export class App implements Host {
     if (!dir) return
     this.spots.textContent = ''
     this.spotEls.clear()
-    this.spots.classList.remove('list')
+    this.spots.classList.remove('listed')
     if (dir.busy || this.paused || !this.layerIdle()) return
     const av = dir.available()
     if (!av.length) return
     if (!this.stage) return this.textStage()
     if (av.length > 4) {
       // seven labelled cylinders on a phone would collide: they become a plain list
-      this.spots.classList.add('list')
+      this.spots.classList.add('listed')
       const list = el('div', { cls: 'list', role: 'list' })
       for (const h of av) list.append(button(t(h.label), '', () => void dir.activate(h.id)))
       this.spots.append(list)
@@ -303,7 +304,7 @@ export class App implements Host {
   private showRecord(text: string) {
     const r = this.recordEl
     r.append(el('p', { textContent: text }))
-    while (r.childElementCount > 3) r.firstElementChild!.remove()
+    while (r.childElementCount > 2) r.firstElementChild!.remove()
     ;[...r.children].forEach((c, i, all) => c.classList.toggle('old', i < all.length - 1))
   }
 
@@ -554,6 +555,7 @@ export class App implements Host {
       case 'hatch':
         s?.built?.event('hatch')
         a.tick('hatch')
+        a.sample('audio/clasp.mp3', 0.6)
         break
       case 'door': {
         // always behind and far away: the visitor cannot look at it
@@ -563,11 +565,16 @@ export class App implements Host {
       }
       case 'relay':
         a.tick('lever')
+        a.sample('audio/cabinet.mp3', 0.7)
         s?.built?.event('relay')
         a.tick('skin')
         break
       case 'walker':
         s?.built?.event('walker', data)
+        if (data === 'approach' && s) {
+          const p = s.camera.position
+          a.footfalls(p.x * 0.7, p.y - 2, p.z * 0.7)
+        }
         break
       case 'lookUp':
         s?.built?.event('lookUp')

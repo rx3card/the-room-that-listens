@@ -139,7 +139,7 @@ function dish() {
 export async function buildHeadland(q: Quality): Promise<Built> {
   const scene = new THREE.Scene()
   scene.fog = new THREE.FogExp2('#090a10', 0.0052)
-  const dome = sky({ zenith: '#04050a', horizon: '#0d0f18', glow: '#7f6a55', glowDir: v3(0.2, 0.34, 1), glowSize: 320, stars: 0.5, clouds: 0.92 })
+  const dome = sky({ zenith: '#05070e', horizon: '#141822', glow: '#8d7a68', glowDir: v3(0.2, 0.34, 1), glowSize: 320, stars: 0, clouds: 0.95 })
   scene.add(dome)
 
   const seaMesh = sea(q)
@@ -155,9 +155,17 @@ export async function buildHeadland(q: Quality): Promise<Built> {
   scene.add(slab)
 
   // The pier: a thin leg rising to the focus, with a gantry running back to the hole in the bowl.
-  const pier = new THREE.Mesh(new THREE.BoxGeometry(1.3, CX - GROUND, 1.3), concrete)
+  const pier = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 1.05, CX - GROUND, 4, 1).rotateY(Math.PI / 4), concrete)
   pier.position.set(0, (CX + GROUND) / 2 - 0.2, FOCUS.z)
   pier.castShadow = pier.receiveShadow = true
+  // four battered fins, the way a 1930s engineer would stiffen a thin leg
+  for (let i = 0; i < 4; i++) {
+    const fin = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 2.2, 8, 3, 1).scale(1, 1, 0.08), concrete)
+    fin.position.set(0, GROUND + 4, FOCUS.z)
+    fin.rotation.y = (i * Math.PI) / 2 + Math.PI / 6
+    fin.castShadow = true
+    scene.add(fin)
+  }
   const deck = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.22, 2.6), rust)
   deck.position.set(0, CX, FOCUS.z)
   deck.castShadow = deck.receiveShadow = true
@@ -166,9 +174,14 @@ export async function buildHeadland(q: Quality): Promise<Built> {
   gantry.castShadow = true
   scene.add(pier, deck, gantry)
   for (const sx of [-0.5, 0.5]) {
-    const rail = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, DISH_F - 2), rust)
-    rail.position.set(sx, CX + 1, FOCUS.z + (DISH_F - 2) / 2 + 1)
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.03, DISH_F - 2.2), rust)
+    rail.position.set(sx, CX + 1, FOCUS.z + (DISH_F - 2.2) / 2 + 1.2)
     scene.add(rail)
+    for (let i = 0; i < 5; i++) {
+      const stay = new THREE.Mesh(new THREE.BoxGeometry(0.03, 1, 0.03), rust)
+      stay.position.set(sx, CX + 0.5, FOCUS.z + 1.3 + i * 1.5)
+      scene.add(stay)
+    }
   }
 
   // Ladder rungs: scale reference against the pier.
@@ -191,24 +204,25 @@ export async function buildHeadland(q: Quality): Promise<Built> {
   scene.add(lampPost)
 
   // Key: the single lamp at the focus, thrown into the bowl. Everything we can see, it lights.
-  const key = shadowed(new THREE.SpotLight('#ffaa55', 900, 46, 1.05, 0.72, 1.6), q, 0.5, 46)
+  const key = shadowed(new THREE.SpotLight('#ffaa55', 210, 44, 0.95, 0.85, 1.75), q, 0.5, 46)
   key.position.set(-0.7, CX + 2, FOCUS.z + 0.2)
-  key.target.position.set(0, CX - 4, 3)
+  key.target.position.set(0.2, CX - 3, 2)
   scene.add(key, key.target)
   const fill = new THREE.PointLight('#ffaa55', 16, 12, 1.8)
   fill.position.set(-0.7, CX + 1.6, FOCUS.z + 0.2)
   scene.add(fill)
-  const moon = new THREE.DirectionalLight('#7f8ca8', 0.55)
+  const moon = new THREE.DirectionalLight('#8796b4', 1.5)
   moon.position.set(60, 90, -240)
-  scene.add(moon, new THREE.HemisphereLight('#20263a', '#050508', 0.42))
+  scene.add(moon, new THREE.HemisphereLight('#2c3550', '#07070b', 1.5))
 
   const lampGlow = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 12), new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffc58a').multiplyScalar(26) }))
   lampGlow.position.set(-0.72, CX + 1.98, FOCUS.z + 0.2)
   scene.add(lampGlow)
 
-  const cone = beam(14, 9, '#ffaa55', 0.05)
+  // the visible part of the lamp's throw, aimed where the spot is aimed
+  const cone = beam(13, 8, '#ffaa55', 0.035)
   cone.position.copy(key.position)
-  cone.rotation.x = 2.45
+  cone.quaternion.setFromUnitVectors(v3(0, -1, 0), key.target.position.clone().sub(key.position).normalize())
   scene.add(cone)
 
   // Iron shutter over the hole at the centre of the bowl.
@@ -274,27 +288,31 @@ export async function buildHeadland(q: Quality): Promise<Built> {
   const rainN = q.rain
   const rainPos = new Float32Array(rainN * 6)
   const rainOff = new Float32Array(rainN * 2)
+  const rainTip = new Float32Array(rainN * 2)
   for (let i = 0; i < rainN; i++) {
     const x = Math.random() * 60 - 30, y = Math.random() * 30, z = Math.random() * 60 - 30
-    rainPos.set([x, y, z, x + 0.01, y - 0.55, z], i * 6)
+    rainPos.set([x, y, z, x, y, z], i * 6)
     rainOff[i * 2] = rainOff[i * 2 + 1] = Math.random()
+    rainTip[i * 2 + 1] = 1
   }
   const rainG = new THREE.BufferGeometry()
   rainG.setAttribute('position', new THREE.BufferAttribute(rainPos, 3))
   rainG.setAttribute('aO', new THREE.BufferAttribute(rainOff, 1))
+  rainG.setAttribute('aTip', new THREE.BufferAttribute(rainTip, 1))
   const rainM = new THREE.ShaderMaterial({
     transparent: true,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
     uniforms: { uT: { value: 0 }, uCam: { value: new THREE.Vector3() } },
-    vertexShader: /* glsl */ `uniform float uT; uniform vec3 uCam; attribute float aO; varying float vA;
-      void main(){ vec3 p=position; p.y=mod(p.y-uT*17.-aO*31.,30.)-13.+uCam.y;
-        p.xz=mod(p.xz+vec2(uT*1.6,0.)-uCam.xz,60.)-30.+uCam.xz;
-        vec4 mv=modelViewMatrix*vec4(p,1.); vA=smoothstep(40.,4.,-mv.z); gl_Position=projectionMatrix*mv; }`,
-    fragmentShader: /* glsl */ `varying float vA; void main(){ gl_FragColor=vec4(.72,.74,.8,vA*.14); }`,
+    vertexShader: /* glsl */ `uniform float uT; uniform vec3 uCam; attribute float aO,aTip; varying float vA;
+      void main(){ vec3 p=position; p.y=mod(p.y-uT*17.-aO*31.,30.)-13.+uCam.y-aTip*.5;
+        p.xz=mod(p.xz+vec2(uT*1.6,0.)-uCam.xz,60.)-30.+uCam.xz+vec2(aTip*.05,0.);
+        vec4 mv=modelViewMatrix*vec4(p,1.); vA=smoothstep(30.,3.,-mv.z)*smoothstep(1.,3.,-mv.z); gl_Position=projectionMatrix*mv; }`,
+    fragmentShader: /* glsl */ `varying float vA; void main(){ gl_FragColor=vec4(.72,.74,.8,vA*.1); }`,
   })
   const rain = new THREE.LineSegments(rainG, rainM)
   rain.frustumCulled = false
+  rain.renderOrder = 2
   scene.add(rain)
   const motes = dust(q, v3(-0.7, CX, FOCUS.z + 2), 9, '#ffb878', 0.018)
   scene.add(motes)
@@ -305,12 +323,12 @@ export async function buildHeadland(q: Quality): Promise<Built> {
 
   const b: Built = {
     scene,
-    exposure: 1.05,
-    bloom: 0.8,
+    exposure: 1.5,
+    bloom: 0.7,
     nodes: {
       sea: { pos: v3(0, 5, -560), look: v3(0, 8, 0), fov: 42, range: [0.2, 0.1] },
-      forecourt: { pos: v3(-3.2, GROUND + 1.65, -24), look: v3(0.4, CX - 2.5, -2), fov: 62, range: [0.75, 0.38] },
-      seat: { pos: v3(0, CX + 1.2, FOCUS.z + 0.05), look: v3(0, CX + 0.6, 2), fov: 58, range: [1.1, 0.5] },
+      forecourt: { pos: v3(-8.5, GROUND + 1.65, -33), look: v3(-1.2, CX - 3.5, -2), fov: 52, range: [0.8, 0.38] },
+      seat: { pos: v3(0, CX + 1.2, FOCUS.z + 0.05), look: v3(0, CX + 0.6, 2), fov: 58, range: [1.1, 0.5], exposure: 0.55 },
     },
     anchors: {
       plate: plate.position.clone(),
@@ -321,13 +339,14 @@ export async function buildHeadland(q: Quality): Promise<Built> {
       down: v3(0.8, CX - 0.5, FOCUS.z - 1.2),
       climb: v3(0, CX + 1, FOCUS.z),
     },
+    light: () => flicker,
     update(t, dt, live: Live) {
       for (const o of [dome, seaMesh, rain, motes]) (o.material as THREE.ShaderMaterial).uniforms.uT.value = t
       rainM.uniforms.uCam.value.copy(live.cam.position)
       // the lamp is on old wiring; it dips rarely, gently, never strobes
       const dip = Math.sin(t * 0.37) * Math.sin(t * 1.13)
       flicker += ((dip > 0.82 ? 0.72 : 1) - flicker) * Math.min(1, dt * 6)
-      key.intensity = 900 * flicker * (1 - live.lean * 0.55)
+      key.intensity = 210 * flicker * (1 - live.lean * 0.55)
       fill.intensity = 16 * flicker * (1 - live.lean * 0.55)
       if (opening) open = Math.min(1, open + dt / 5)
       const e = smooth(open)
@@ -344,5 +363,5 @@ export async function buildHeadland(q: Quality): Promise<Built> {
   return b
 }
 
-export const flightPath = (): THREE.Vector3[] => [v3(0, 5, -560), v3(3, 6.5, -360), v3(-6, 12, -180), v3(-10, 30, -96), v3(-6, GROUND + 7, -60), v3(-3.2, GROUND + 1.65, -24)]
+export const flightPath = (): THREE.Vector3[] => [v3(0, 5, -560), v3(3, 6.5, -360), v3(-6, 12, -180), v3(-10, 30, -96), v3(-11, GROUND + 6, -62), v3(-8.5, GROUND + 1.65, -33)]
 export const descentPath = (): THREE.Vector3[] => [v3(0, CX + 1.2, FOCUS.z + 0.05), v3(0, CX + 1.1, -2.5), v3(0, CX + 0.5, -0.4), v3(0, CX + 0.2, 1.1)]
