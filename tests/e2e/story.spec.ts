@@ -36,6 +36,11 @@ test('no audio context exists before a gesture', async ({ page }) => {
   expect(await page.evaluate(() => room.audio.ctx === undefined)).toBe(true)
 })
 
+test('the title links to the source code', async ({ page }) => {
+  await page.goto('/?fast')
+  await expect(page.getByRole('link', { name: 'Source code' })).toHaveAttribute('href', 'https://github.com/rx3card/the-room-that-listens')
+})
+
 test('language switches and is remembered', async ({ page }) => {
   await page.goto('/?fast')
   await page.getByRole('button', { name: 'Español' }).click()

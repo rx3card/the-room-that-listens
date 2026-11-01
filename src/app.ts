@@ -15,7 +15,7 @@ import { register, speech } from './episodes/deaf-point/text'
 import type { Built } from './render/kit'
 import { Stage } from './render/stage'
 import { PLAN_ROUTE, planSvg } from './ui/plan'
-import { button, Crank, el, HoldControl, Strip } from './ui/widgets'
+import { button, Crank, el, githubLink, HoldControl, Strip } from './ui/widgets'
 
 const params = new URLSearchParams(location.search)
 const FAST = params.has('fast') ? 0.02 : 1 // end-to-end tests run the clock quickly
@@ -118,7 +118,7 @@ export class App implements Host {
     root.append(
       el('header', {}, el('span', { textContent: 'Punta Sorda, 2026' }), langs),
       main,
-      el('footer', {}, el('span', { textContent: t('title.headphones') }), button(t('title.archive'), 'link', () => this.archive())),
+      el('footer', {}, el('span', { textContent: t('title.headphones') }), el('div', { cls: 'foot' }, githubLink(t('title.source')), button(t('title.archive'), 'link', () => this.archive()))),
     )
     if (this.data.signal) this.strip.envelope = this.data.signal
     this.ui.append(root)
@@ -939,6 +939,7 @@ export class App implements Host {
       el('h3', { textContent: t('archive.made') }),
       el('p', { cls: 'made', textContent: t('archive.madeB') }),
       el('p', { cls: 'made', textContent: t('archive.code') }),
+      el('p', { cls: 'made' }, githubLink(t('title.source'))),
       el('h3', { textContent: t('archive.refs') }),
       el('figure', {}, el('img', { src: `${import.meta.env.BASE_URL}assets/img/denge.jpg`, alt: t('archive.denge'), loading: 'lazy', width: 1400, height: 933 }), el('figcaption', { textContent: t('archive.denge') })),
       table(credits.reading),

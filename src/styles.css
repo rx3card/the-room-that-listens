@@ -64,6 +64,9 @@ a { color: inherit; text-underline-offset: 0.2em; }
 .title footer { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: var(--small); color: var(--mute); }
 .langs button { pointer-events: auto; margin-left: 0.8em; color: var(--mute); text-decoration: none; min-height: 44px; }
 .langs button[aria-pressed='true'] { color: var(--bone); text-decoration: underline; text-underline-offset: 0.25em; }
+.foot { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+.source { pointer-events: auto; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--bone); text-decoration: underline; text-underline-offset: 0.25em; text-decoration-thickness: 1px; }
+.source:hover { color: var(--amber); }
 .again { color: var(--amber); margin-top: 16px; }
 
 /* The record: the room's stenography, always in view at the foot of the screen. A neutral scrim keeps it readable over any scene. */
