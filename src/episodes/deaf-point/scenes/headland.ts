@@ -2,12 +2,8 @@ import * as THREE from 'three'
 import type { Quality } from '../../../core/quality'
 import { beam, canvasTexture, dust, fbm, lathe, model, pbr, sharedDispose, shadowed, sky, v3, vnoise, type Built, type Live } from '../../../render/kit'
 import { smooth } from '../../../core/tween'
+import { CX, DISH_F, DISH_R, FOCUS, GROUND } from './paths'
 
-const DISH_R = 15
-const DISH_F = 9
-const GROUND = 30
-const CX = DISH_R + GROUND // height of the dish axis
-export const FOCUS = v3(0, CX, -DISH_F + 1)
 
 // Land height. The headland is a tongue of rock reaching toward -z, with the forecourt levelled on top.
 function coast(x: number, z: number) {
@@ -147,7 +143,7 @@ export async function buildHeadland(q: Quality): Promise<Built> {
 
   const concrete = pbr('wall', [0.8, 0.8], { color: '#8d8a86', roughness: 1 })
   const floorMat = pbr('floor', [9, 9], { color: '#7a7773', roughness: 0.85, metalness: 0 })
-  const rust = pbr('rust', [1, 1], { color: '#8b6a56', metalness: 0.5, roughness: 0.9 })
+  const rust = pbr('rust', [1, 1], { color: '#4e4440', metalness: 0.3, roughness: 0.95 })
 
   const slab = new THREE.Mesh(new THREE.CircleGeometry(36, 80).rotateX(-Math.PI / 2), floorMat)
   slab.position.set(0, GROUND, -12)
@@ -204,7 +200,7 @@ export async function buildHeadland(q: Quality): Promise<Built> {
   scene.add(lampPost)
 
   // Key: the single lamp at the focus, thrown into the bowl. Everything we can see, it lights.
-  const key = shadowed(new THREE.SpotLight('#ffaa55', 210, 44, 0.95, 0.85, 1.75), q, 0.5, 46)
+  const key = shadowed(new THREE.SpotLight('#ffb27a', 210, 44, 0.95, 0.85, 1.75), q, 0.5, 46)
   key.position.set(-0.7, CX + 2, FOCUS.z + 0.2)
   key.target.position.set(0.2, CX - 3, 2)
   scene.add(key, key.target)
@@ -363,5 +359,3 @@ export async function buildHeadland(q: Quality): Promise<Built> {
   return b
 }
 
-export const flightPath = (): THREE.Vector3[] => [v3(0, 5, -560), v3(3, 6.5, -360), v3(-6, 12, -180), v3(-10, 30, -96), v3(-11, GROUND + 6, -62), v3(-8.5, GROUND + 1.65, -33)]
-export const descentPath = (): THREE.Vector3[] => [v3(0, CX + 1.2, FOCUS.z + 0.05), v3(0, CX + 1.1, -2.5), v3(0, CX + 0.5, -0.4), v3(0, CX + 0.2, 1.1)]

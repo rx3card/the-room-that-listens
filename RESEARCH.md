@@ -67,6 +67,7 @@ Versiones verificadas con `npm view` el 31 de octubre de 2026.
 | three | 0.187.0 | MIT | Usado |
 | postprocessing | 6.39.5 | Zlib | Usado: bloom con mipmaps y un efecto propio de gradación |
 | @react-three/fiber, drei | 9.8.2, 10.7.9 | MIT | Descartados: las escenas son imperativas y la UI no necesita React |
+| n8ao | 2.0.1 | ISC | Usado: oclusión ambiental, el mayor salto frente al aspecto de motor de juego |
 | gsap | 3.15.0 | Licencia propia sin coste, no OSI | Descartado: un tween de 25 líneas basta y deja todo el repositorio con licencias abiertas |
 | howler | 2.2.4 | MIT | Descartado: necesitamos HRTF, convolución y filtros directos, y eso es Web Audio |
 | theatre.js | no evaluado a fondo | | Descartado: sin artista de timeline, las rutas se escriben en código |
@@ -78,9 +79,12 @@ Web Audio: [MDN sobre espacialización](https://developer.mozilla.org/en-US/docs
 ## Recursos descartados
 
 - `coastal_cliff_01` de Poly Haven: 865 000 polígonos y 15 MB de texturas. Se generó el acantilado por código.
-- `Sea waves.wav` (CC BY-SA): el mar se sintetiza y queda sin obligaciones de copyleft.
 - Voz por TTS neuronal (Piper): el entorno denegó ejecutar el binario descargado. Se sustituyó por un sintetizador propio, lo que además encaja mejor con la época.
 - KTX2: no hay `toktx` en la máquina. Se usa WebP. Queda anotado en PERFORMANCE.md.
+
+## Recursos con otras licencias
+
+Por indicación del proyecto, personal por ahora, se amplió la búsqueda más allá de CC0: música CC BY de SINIUS y grabaciones CC BY-SA. Openverse e Internet Archive no respondieron durante la sesión. Otros candidatos anotados: *Distant Screams* (OpenGameArt, CC BY-SA 4.0) y el catálogo de Cian Orbe y Mist Label en archive.org, que hay que comprobar pista a pista.
 
 ## Riesgos de imitación
 
@@ -92,4 +96,5 @@ Web Audio: [MDN sobre espacialización](https://developer.mozilla.org/en-US/docs
 1. El sonido negado es el terror: ves el mar romper y no oyes nada, hasta un único final.
 2. La frase del título con la señal en vivo es la identidad, y regresa al final cambiada.
 3. Una luz por escena. Si no se justifica con una lámpara, no existe.
+3b. El tiempo real con geometría propia no alcanza el fotorrealismo por sí solo. Los estudios citados hornean la luz; aquí esa función la cumplen los planos pintados de ASSETS_TO_GENERATE.md.
 4. Todo lo que el lugar dice saber del visitante está medido.

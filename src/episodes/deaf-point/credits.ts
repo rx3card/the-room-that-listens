@@ -14,12 +14,25 @@ export const recordings: Credit[] = [
   { title: 'Tchaikovsky, Anton Rubinstein and friends, cylinder, 1890', by: 'Julius Block', licence: 'Public domain', url: wc('Tchaikowsky & Anton Rubinstein & friends(1890).ogg') },
   { title: 'Arthur Sullivan, cylinder, 1888', by: 'George Gouraud', licence: 'Public domain', url: wc('Arthur Sullivan - wax cylinder recording.ogg') },
   { title: 'Wind on Mars, recorded by Perseverance SuperCam, 2021', by: 'NASA/JPL-Caltech/LANL/CNES/IRAP', licence: 'Public domain', url: wc("Perseverance rover's SuperCam records wind on Mars.oga") },
+  { title: 'Sea waves', by: 'Ganesh Mohan T', licence: 'CC BY-SA 4.0', url: wc('Sea waves.wav') },
+  { title: 'Rain on a veranda', by: 'ezwa', licence: 'Public domain', url: wc('Rain on a veranda and t.ogg') },
+  { title: 'Pasos en escalera de caracol', by: 'Hippocampuz', licence: 'CC BY-SA 4.0', url: wc('Pasos en escalera de caracol.ogg') },
+  { title: 'Rusty metal door clasp', by: 'stephan', licence: 'Public domain', url: wc('Rusty metal door clasp.ogg') },
+  { title: 'Metal cabinet door jarring', by: 'stephan', licence: 'Public domain', url: wc('Metal cabinet door jarring.ogg') },
+]
+
+export const music: Credit[] = [
+  { title: 'Feeling Watched', by: 'SINIUS, The Silence Before the Haunting', licence: 'CC BY 4.0', url: 'https://freemusicarchive.org/music/sinius/the-silence-before-the-haunting/feeling-watched/' },
+  { title: 'Sensory Deprivation', by: 'SINIUS, The Silence Before the Haunting', licence: 'CC BY 4.0', url: 'https://freemusicarchive.org/music/sinius/the-silence-before-the-haunting/sensory-deprivation/' },
+  { title: 'Perceptual Isolation', by: 'SINIUS, The Silence Before the Haunting', licence: 'CC BY 4.0', url: 'https://freemusicarchive.org/music/sinius/the-silence-before-the-haunting/perceptual-isolation/' },
 ]
 
 export const images: Credit[] = [
   { title: 'Fig. 904, external and middle ear', by: 'Henry Gray, Anatomy of the Human Body, 1918', licence: 'Public domain', url: wc('Gray904.png') },
   { title: 'Fig. 928, section through the cochlea', by: 'Henry Gray, Anatomy of the Human Body, 1918', licence: 'Public domain', url: wc('Gray928.png') },
 ]
+
+export const photographs = { denge: { title: 'Acoustic Mirrors', by: 'Teseum', licence: 'CC BY-SA 4.0', url: wc('Acoustic_Mirrors.jpg') } }
 
 export const materials: Credit[] = [
   { title: 'Concrete Layers 02', by: 'Poly Haven', licence: 'CC0', url: ph('concrete_layers_02') },
@@ -28,6 +41,7 @@ export const materials: Credit[] = [
   { title: 'Dark Rock', by: 'Poly Haven', licence: 'CC0', url: ph('dark_rock') },
   { title: 'Dark Wooden Planks', by: 'Poly Haven', licence: 'CC0', url: ph('dark_wooden_planks') },
   { title: 'Rust Coarse 01', by: 'Poly Haven', licence: 'CC0', url: ph('rust_coarse_01') },
+  { title: 'Damp Beach Sand', by: 'Poly Haven', licence: 'CC0', url: ph('damp_beach_sand') },
   { title: 'Painted Wooden Chair 01', by: 'Kuutti Siitonen, Poly Haven', licence: 'CC0', url: ph('painted_wooden_chair_01') },
   { title: 'Metal Office Desk', by: 'Ulan Cabanilla, Poly Haven', licence: 'CC0', url: ph('metal_office_desk') },
   { title: 'Vintage Oil Lamp', by: 'Monsta3D, Poly Haven', licence: 'CC0', url: ph('vintage_oil_lamp') },

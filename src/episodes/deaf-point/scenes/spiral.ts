@@ -89,10 +89,11 @@ function wires(q: Quality) {
       uG3: { value: new THREE.Vector3(0, -1000, 0) },
       uCam: { value: new THREE.Vector3() },
       uStill: { value: 0 },
+      uPx: { value: 0.002 },
     },
     vertexShader: /* glsl */ `
-      attribute vec3 aBase,aDir,aInfo; uniform float uT,uWave,uAmp,uStill; uniform vec3 uG0,uG1,uG2,uG3,uCam;
-      varying float vTip,vLit,vFog,vNear;
+      attribute vec3 aBase,aDir,aInfo; uniform float uT,uWave,uAmp,uStill,uPx; uniform vec3 uG0,uG1,uG2,uG3,uCam;
+      varying float vTip,vLit,vFog,vNear,vFade;
       vec3 repel(vec3 p,vec3 a,vec3 b){ vec3 pa=p-a,ba=b-a; float h=clamp(dot(pa,ba)/dot(ba,ba),0.,1.); vec3 d=pa-ba*h; float l=length(d)+.001; float s=smoothstep(.62,.16,l); return d/l*s*.62; }
       void main(){
         float y=position.y; float p=aInfo.x, L=aInfo.y, s=aInfo.z;
@@ -107,18 +108,23 @@ function wires(q: Quality) {
         // the wires part for the visitor too, and do not quite touch them
         vec3 toCam=w-uCam; float dc=length(toCam.xz)+.001; w.xz+=toCam.xz/dc*smoothstep(1.3,.3,dc)*.8*k;
         vec3 side=normalize(cross(aDir,uCam-w));
-        vec3 pos=w+side*position.x*mix(.013,.003,y);
+        float dist=distance(uCam,w);
+        // never thinner than about a pixel; beyond that a wire fades instead of breaking into dashes
+        float width=mix(.013,.004,y);
+        float px=dist*uPx;
+        vFade=clamp(width/px*2.5,.3,1.);
+        vec3 pos=w+side*position.x*max(width,px);
         vec4 mv=viewMatrix*vec4(pos,1.);
-        vTip=y; vLit=env; vFog=1.-exp(-(-mv.z)*.2); vNear=smoothstep(.5,2.4,-mv.z);
+        vTip=y; vLit=env; vFog=1.-exp(-(-mv.z)*.12); vNear=smoothstep(.5,2.4,-mv.z);
         gl_Position=projectionMatrix*mv;
       }`,
     fragmentShader: /* glsl */ `
-      varying float vTip,vLit,vFog,vNear;
+      varying float vTip,vLit,vFog,vNear,vFade;
       void main(){
-        vec3 c=mix(vec3(.02,.021,.025),vec3(.36,.35,.33),vTip*vTip)*(.25+.75*vNear);
+        vec3 c=mix(vec3(.02,.021,.025),vec3(.6,.58,.54),vTip*vTip)*(.25+.75*vNear);
         c=mix(c,vec3(1.,.42,.07)*2.4,vLit*vTip);
         c=mix(c,vec3(.004,.005,.008),vFog);
-        gl_FragColor=vec4(c,1.);
+        gl_FragColor=vec4(c,vFade*(1.-vFog*.8));
       }`,
   })
   const mesh = new THREE.Mesh(g, m)
@@ -133,19 +139,20 @@ const node = (p: number, fov = 66) => {
   const pos = spiralAt(p)
   const f = frame(p)
   pos.addScaledVector(f.up, -0.45)
-  return { pos, look: spiralAt(Math.min(1, p + 0.04)).addScaledVector(f.up, -0.2), fov, range: [0.75, 0.4] as [number, number] }
+  // aimed a little ahead along the curve, so the wall visibly bends away to the left
+  return { pos, look: spiralAt(Math.min(1, p + 0.07)).addScaledVector(f.up, -0.2), fov, range: [0.75, 0.4] as [number, number] }
 }
 
 export async function buildSpiral(q: Quality): Promise<Built> {
   const scene = new THREE.Scene()
   scene.background = new THREE.Color('#010203')
-  scene.fog = new THREE.FogExp2('#010203', 0.13)
+  scene.fog = new THREE.FogExp2('#010203', 0.075)
 
-  const wall = new THREE.Mesh(tunnel(), pbr('wall', [1, 1], { color: '#26272c', roughness: 0.95, side: THREE.BackSide }))
+  const wall = new THREE.Mesh(tunnel(), pbr('wall', [1, 1], { color: '#62646c', roughness: 0.85, side: THREE.DoubleSide }))
   scene.add(wall)
   // Ribs of old shuttering every couple of metres give the eye a rhythm to count, then lose count of.
   const ribs = 96
-  const rib = new THREE.InstancedMesh(new THREE.TorusGeometry(1, 0.07, 6, 28), pbr('wall', [2, 0.2], { color: '#1c1c20', roughness: 1 }), ribs)
+  const rib = new THREE.InstancedMesh(new THREE.TorusGeometry(1, 0.07, 6, 28), pbr('wall', [2, 0.2], { color: '#74767e', roughness: 0.9 }), ribs)
   for (let i = 0; i < ribs; i++) {
     const p = (i + 0.5) / ribs
     const f = frame(p)
@@ -158,7 +165,7 @@ export async function buildSpiral(q: Quality): Promise<Built> {
   scene.add(w.mesh)
 
   // Two lamps only: one that follows the visitor at waist height and the orange trace of the passing wave.
-  const walk = new THREE.PointLight('#aeb8cc', 5, 9, 1.8)
+  const walk = new THREE.PointLight('#aeb8cc', 16, 16, 1.5)
   const trace = new THREE.PointLight('#ff6a00', 0, 9, 1.8)
   scene.add(walk, trace, new THREE.HemisphereLight('#1a2030', '#000', 0.05))
 
@@ -211,6 +218,7 @@ export async function buildSpiral(q: Quality): Promise<Built> {
     update(t, dt, live: Live) {
       gl.uT.value = t
       gl.uCam.value.copy(live.cam.position)
+      gl.uPx.value = (2 * Math.tan(THREE.MathUtils.degToRad(live.cam.fov / 2))) / innerHeight / q.dpr
       gl.uWave.value = (t * 0.021) % 1.2
       gl.uAmp.value = 0.4 + live.level * 4
       stillness += (live.lean - stillness) * Math.min(1, dt * 3)

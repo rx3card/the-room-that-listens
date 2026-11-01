@@ -10,7 +10,7 @@ import { Director, newState } from './engine/director'
 import type { Host, SceneDef } from './engine/types'
 import { cylinders, deafPoint, RELAY_CODE, type CylinderId } from './episodes/deaf-point'
 import * as credits from './episodes/deaf-point/credits'
-import { descentPath, flightPath, FOCUS } from './episodes/deaf-point/scenes/headland'
+import { descentPath, flightPath, FOCUS } from './episodes/deaf-point/scenes/paths'
 import { register, speech } from './episodes/deaf-point/text'
 import type { Built } from './render/kit'
 import { Stage } from './render/stage'
@@ -28,12 +28,13 @@ const hasWebGL = () => {
   }
 }
 
-async function buildStage(name: string, stage: Stage, fallen: number[]): Promise<Built> {
+async function buildStage(name: string, stage: Stage, fallen: number[], lines: string[]): Promise<Built> {
+  await Promise.all([document.fonts.load('30px "Courier Prime"'), document.fonts.load('600 44px "Host Grotesk Variable"')]) // canvas text needs them ready
   // Each chapter's scene is its own chunk, fetched when the story reaches it.
   if (name === 'headland') return (await import('./episodes/deaf-point/scenes/headland')).buildHeadland(stage.q)
   if (name === 'wax') return (await import('./episodes/deaf-point/scenes/wax')).buildWax(stage.q)
   if (name === 'spiral') return (await import('./episodes/deaf-point/scenes/spiral')).buildSpiral(stage.q)
-  return (await import('./episodes/deaf-point/scenes/other')).buildOther(stage.q, fallen)
+  return (await import('./episodes/deaf-point/scenes/other')).buildOther(stage.q, fallen, lines)
 }
 
 export class App implements Host {
@@ -163,7 +164,7 @@ export class App implements Host {
 
   async ensureStage(name: string) {
     if (!this.stage || this.stageName === name) return
-    const built = await buildStage(name, this.stage, this.fallen())
+    const built = await buildStage(name, this.stage, this.fallen(), this.rec.lines().map(l => `${l.time}  ${l.text}`))
     this.stageName = name
     this.stage.setBuilt(built, undefined, name)
     built.event('walkerStep', () => {
@@ -214,9 +215,12 @@ export class App implements Host {
       node.style.display = p ? '' : 'none'
       if (!p) continue
       const bar = innerWidth > innerHeight ? clamp((innerHeight - innerWidth / 2.39) / 2, 0, innerHeight * 0.15) : 0
-      const x = clamp(p.x, 40, innerWidth - 40), y = clamp(p.y, bar + 28, innerHeight - bar - 28)
-      node.style.transform = `translate(${x}px, ${y}px)`
-      node.classList.toggle('flip', x > innerWidth - 240)
+      // on a portrait phone the record sits on the image, so marks stay above it
+      const foot = innerWidth > innerHeight ? bar + 28 : innerHeight * 0.3
+      const x = clamp(p.x, 40, innerWidth - 40), y = clamp(p.y, bar + 56, innerHeight - foot)
+      const flip = x > innerWidth - 240
+      node.style.transform = `translate(${x}px, ${y}px)${flip ? ' translateX(calc(-100% + 48px))' : ''}`
+      node.classList.toggle('flip', flip)
     }
   }
 
@@ -230,8 +234,8 @@ export class App implements Host {
     const av = dir.available()
     if (!av.length) return
     if (!this.stage) return this.textStage()
-    if (av.length > 4) {
-      // seven labelled cylinders on a phone would collide: they become a plain list
+    if (av.length > 4 || (innerHeight > innerWidth && av.length > 2)) {
+      // labelled marks collide when crowded or on a narrow phone: they become a plain list
       this.spots.classList.add('listed')
       const list = el('div', { cls: 'list', role: 'list' })
       for (const h of av) list.append(button(t(h.label), '', () => void dir.activate(h.id)))
@@ -922,6 +926,8 @@ export class App implements Host {
       el('p', { cls: 'lead', textContent: t('archive.lead') }),
       el('h3', { textContent: t('archive.real') }),
       table([...credits.recordings, ...credits.images]),
+      el('h3', { textContent: t('archive.music') }),
+      table(credits.music),
       el('h3', { textContent: t('archive.tex') }),
       table(credits.materials),
       el('h3', { textContent: t('archive.fonts') }),
@@ -930,6 +936,7 @@ export class App implements Host {
       el('p', { cls: 'made', textContent: t('archive.madeB') }),
       el('p', { cls: 'made', textContent: t('archive.code') }),
       el('h3', { textContent: t('archive.refs') }),
+      el('figure', {}, el('img', { src: `${import.meta.env.BASE_URL}assets/img/denge.jpg`, alt: t('archive.denge'), loading: 'lazy', width: 1400, height: 933 }), el('figcaption', { textContent: t('archive.denge') })),
       table(credits.reading),
     )
     this.ui.append(root)

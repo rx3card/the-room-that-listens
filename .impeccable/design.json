@@ -1,0 +1,456 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-31T23:57:15.616967+00:00",
+  "title": "Design System: The Room That Listens",
+  "extensions": {
+    "colorMeta": {
+      "ember": {
+        "role": "primary",
+        "displayName": "Ember",
+        "canonical": "#ff6a00",
+        "tonalRamp": [
+          "#280000",
+          "#590000",
+          "#890000",
+          "#b51d00",
+          "#da4f00",
+          "#f67f46",
+          "#ffb28d",
+          "#ffe7da"
+        ]
+      },
+      "amber": {
+        "role": "primary",
+        "displayName": "Amber",
+        "canonical": "#ffaa55",
+        "tonalRamp": [
+          "#1e0100",
+          "#471000",
+          "#702a00",
+          "#974a00",
+          "#b96d0c",
+          "#d79555",
+          "#eebf95",
+          "#fcebdc"
+        ]
+      },
+      "violet": {
+        "role": "secondary",
+        "displayName": "Violet",
+        "canonical": "#261231",
+        "tonalRamp": [
+          "#100715",
+          "#2d1e36",
+          "#4d3959",
+          "#6d577b",
+          "#8f789d",
+          "#b09cbc",
+          "#d1c3da",
+          "#f1ecf4"
+        ]
+      },
+      "blood": {
+        "role": "secondary",
+        "displayName": "Blood",
+        "canonical": "#55151d",
+        "tonalRamp": [
+          "#1b0305",
+          "#421317",
+          "#692b30",
+          "#8f494d",
+          "#b26c6e",
+          "#d09293",
+          "#e9bcbd",
+          "#faeaea"
+        ]
+      },
+      "lamp": {
+        "role": "tertiary",
+        "displayName": "Lamp",
+        "canonical": "#ffb27a",
+        "tonalRamp": [
+          "#1c0300",
+          "#431400",
+          "#6b2e00",
+          "#914d0b",
+          "#b4703b",
+          "#d2966b",
+          "#eabfa2",
+          "#fbebe1"
+        ]
+      },
+      "black": {
+        "role": "neutral",
+        "displayName": "Black",
+        "canonical": "#050507",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#252527",
+          "#414245",
+          "#616165",
+          "#828286",
+          "#a4a5a8",
+          "#c9c9cb",
+          "#eeeeef"
+        ]
+      },
+      "coal": {
+        "role": "neutral",
+        "displayName": "Coal",
+        "canonical": "#0b0b10",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#242529",
+          "#414147",
+          "#606067",
+          "#818288",
+          "#a4a4aa",
+          "#c8c9cd",
+          "#eeeef0"
+        ]
+      },
+      "letterbox": {
+        "role": "neutral",
+        "displayName": "Letterbox",
+        "canonical": "#000000",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#24232b",
+        "tonalRamp": [
+          "#0b0b0e",
+          "#25242a",
+          "#424149",
+          "#616069",
+          "#82818a",
+          "#a5a4ac",
+          "#c9c8ce",
+          "#eeeef0"
+        ]
+      },
+      "mineral": {
+        "role": "neutral",
+        "displayName": "Mineral",
+        "canonical": "#77747f",
+        "tonalRamp": [
+          "#0c0a0e",
+          "#26242b",
+          "#43404a",
+          "#625f6a",
+          "#83808b",
+          "#a6a3ad",
+          "#cac8cf",
+          "#efeef0"
+        ]
+      },
+      "mute": {
+        "role": "neutral",
+        "displayName": "Mute",
+        "canonical": "#b5b0ac",
+        "tonalRamp": [
+          "#0c0b09",
+          "#272422",
+          "#45413e",
+          "#65605d",
+          "#86817e",
+          "#a8a4a1",
+          "#cbc8c6",
+          "#efeeed"
+        ]
+      },
+      "bone": {
+        "role": "neutral",
+        "displayName": "Bone",
+        "canonical": "#e8e3dd",
+        "tonalRamp": [
+          "#0c0b09",
+          "#272521",
+          "#45413d",
+          "#65605b",
+          "#86827c",
+          "#a8a4a0",
+          "#cbc9c5",
+          "#efeeed"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#dcd5c8",
+        "tonalRamp": [
+          "#0d0b07",
+          "#29241d",
+          "#474137",
+          "#676055",
+          "#888276",
+          "#aaa49a",
+          "#ccc9c2",
+          "#f0eeec"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#15130f",
+        "tonalRamp": [
+          "#0c0b09",
+          "#262521",
+          "#44423d",
+          "#63615c",
+          "#84827d",
+          "#a7a5a0",
+          "#cac9c6",
+          "#efeeed"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "poster": {
+        "displayName": "Poster",
+        "purpose": "Frase de título, capítulos, fechas, finales y portada del archivo."
+      },
+      "head": {
+        "displayName": "Head",
+        "purpose": "Títulos de menú, archivo y pantallas de texto."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "Entrada, voz, avisos y relato final."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Texto corrido."
+      },
+      "record": {
+        "displayName": "Record",
+        "purpose": "Registro al pie."
+      },
+      "action": {
+        "displayName": "Action",
+        "purpose": "Etiquetas de botón."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "Metadatos, leyendas y nombres de marcas."
+      },
+      "typed": {
+        "displayName": "Typed",
+        "purpose": "Solo la máquina de Ruano."
+      }
+    },
+    "shadows": [
+      {
+        "name": "legibility-halo",
+        "value": "0 0 18px #000",
+        "purpose": "Solo texto sin caja sobre imagen 3D en vivo; radios de 3px a 40px según tamaño."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(0.2, 0.7, 0.1, 1)",
+        "purpose": "Entradas y transformaciones de interfaz."
+      },
+      {
+        "name": "ui-state",
+        "value": "180ms",
+        "purpose": "Hover y foco de botones."
+      },
+      {
+        "name": "record-in",
+        "value": "900ms",
+        "purpose": "Entrada de líneas del registro, 6px."
+      },
+      {
+        "name": "record-age",
+        "value": "2400ms linear",
+        "purpose": "Paso de línea actual a 0.6."
+      },
+      {
+        "name": "mark-pulse",
+        "value": "3600ms ease-in-out infinite",
+        "purpose": "Único bucle CSS de la interfaz."
+      },
+      {
+        "name": "camera-move",
+        "value": "3200ms",
+        "purpose": "Traslado entre nodos con 0.12 de arco de paso."
+      },
+      {
+        "name": "camera-breath",
+        "value": "0.008 a 0.7 rad/s",
+        "purpose": "Respiración de cámara; desaparece con movimiento reducido."
+      },
+      {
+        "name": "plate-dissolve",
+        "value": "450ms out, 700ms in",
+        "purpose": "Salida de una placa por negro."
+      },
+      {
+        "name": "plate-in",
+        "value": "1200ms",
+        "purpose": "Aparición de una placa."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "portrait",
+        "value": "(max-aspect-ratio: 1/1)"
+      },
+      {
+        "name": "narrow",
+        "value": "760px"
+      },
+      {
+        "name": "coarse",
+        "value": "(pointer: coarse)"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Acción principal plana; Bone en reposo, Amber en hover y foco.",
+      "html": "<button class=\"ds-btn\">Enter with sound</button>",
+      "css": ".ds-btn { background:var(--bone); color:var(--black); font-weight:600; padding:0.72em 1.15em; border:0; border-radius:0; cursor:pointer; transition:background .18s, color .18s, transform .18s cubic-bezier(0.2,0.7,0.1,1); } .ds-btn:hover, .ds-btn:focus-visible { background:var(--amber); } .ds-btn:focus-visible { outline:2px solid var(--amber); outline-offset:3px; } .ds-btn:active { transform:translateY(1px); }"
+    },
+    {
+      "name": "Quiet Button",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "Alternativa de igual dignidad; Coal que pasa a Violet.",
+      "html": "<button class=\"ds-btn-quiet\">Enter in silence</button>",
+      "css": ".ds-btn-quiet { background:var(--coal); color:var(--bone); font-weight:600; padding:0.72em 1.15em; border:0; border-radius:0; cursor:pointer; transition:background .18s, color .18s, transform .18s cubic-bezier(0.2,0.7,0.1,1); } .ds-btn-quiet:hover, .ds-btn-quiet:focus-visible { background:var(--violet); } .ds-btn-quiet:focus-visible { outline:2px solid var(--amber); outline-offset:3px; }"
+    },
+    {
+      "name": "Text Link",
+      "kind": "custom",
+      "description": "Enlace de borde de pantalla con subrayado de 1px.",
+      "html": "<a class=\"ds-link\" href=\"#\">Archives &amp; Credits</a>",
+      "css": ".ds-link { color:var(--bone); text-decoration:underline; text-underline-offset:.25em; text-decoration-thickness:1px; } .ds-link:hover { color:var(--amber); } .ds-link:focus-visible { outline:2px solid var(--amber); outline-offset:3px; }"
+    },
+    {
+      "name": "Title Sentence",
+      "kind": "custom",
+      "description": "Frase Poster con la tira de señal en lugar de una palabra.",
+      "html": "<div class=\"ds-sentence\"><span>The room that</span><svg class=\"ds-strip\" viewBox=\"0 0 120 20\" preserveAspectRatio=\"none\" aria-hidden=\"true\"><path d=\"M0 10 H74 l3 -2 l4 4 l4 -3 l3 1 H120\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" vector-effect=\"non-scaling-stroke\"/></svg><span>listens</span></div>",
+      "css": ".ds-sentence { display:flex; align-items:center; gap:.16em; font-size:clamp(3rem,7.8vw,10rem); font-weight:600; line-height:.98; letter-spacing:-.04em; white-space:nowrap; color:var(--bone); } .ds-strip { flex:1; min-width:.6em; height:.72em; }"
+    },
+    {
+      "name": "Record",
+      "kind": "custom",
+      "description": "Registro al pie; la línea anterior baja a 0.6.",
+      "html": "<div class=\"ds-record\"><p class=\"ds-old\">The lamp in the wax room is already lit.</p><p>Forty-one years of deposits.</p></div>",
+      "css": ".ds-record { background:var(--letterbox); color:var(--bone); padding:24px; line-height:1.3; letter-spacing:-.01em; } .ds-record p { margin:0 0 .2em; } .ds-old { opacity:.6; }"
+    },
+    {
+      "name": "World Mark",
+      "kind": "custom",
+      "refersTo": "spot-mark",
+      "description": "Anillo de 15px en área de 48px; Ember al activarse.",
+      "html": "<button class=\"ds-spot\"><i></i><span>The desk</span></button>",
+      "css": ".ds-spot { display:inline-flex; align-items:center; gap:10px; min-width:48px; min-height:48px; padding:12px; background:none; border:0; color:var(--bone); cursor:pointer; } .ds-spot:focus-visible { outline:none; } .ds-spot i { width:15px; height:15px; border-radius:50%; border:1.5px solid var(--bone); background:rgba(5,5,7,.35); transition:transform .25s cubic-bezier(0.2,0.7,0.1,1), background .2s, border-color .2s; } .ds-spot span { font-size:.9rem; padding:.1em .45em; background:rgba(5,5,7,.72); opacity:0; transition:opacity .2s; } .ds-spot:hover i, .ds-spot:focus-visible i { background:var(--ember); border-color:var(--ember); transform:scale(1.25); } .ds-spot:hover span, .ds-spot:focus-visible span { opacity:1; }"
+    },
+    {
+      "name": "Hold Control",
+      "kind": "custom",
+      "refersTo": "hold-control",
+      "description": "Aro de 104px; progreso Ember sobre pista Mineral.",
+      "html": "<button class=\"ds-hold\" aria-label=\"Hold\"><svg viewBox=\"0 0 104 104\"><circle class=\"ds-track\" cx=\"52\" cy=\"52\" r=\"46\"/><circle class=\"ds-fill\" cx=\"52\" cy=\"52\" r=\"46\"/></svg></button>",
+      "css": ".ds-hold { position:relative; width:104px; height:104px; padding:0; border:0; border-radius:50%; background:rgba(5,5,7,.55); cursor:pointer; } .ds-hold svg { position:absolute; inset:0; transform:rotate(-90deg); } .ds-hold circle { fill:none; stroke-width:3; } .ds-track { stroke:var(--mineral); } .ds-fill { stroke:var(--ember); stroke-dasharray:289; stroke-dashoffset:190; } .ds-hold:hover, .ds-hold:active { background:rgba(255,106,0,.14); } .ds-hold:focus-visible { outline:2px solid var(--amber); outline-offset:3px; }"
+    },
+    {
+      "name": "Typed Sheet",
+      "kind": "card",
+      "refersTo": "sheet-typed",
+      "description": "Papel mecanografiado de Ruano con tachadura y botón Ink.",
+      "html": "<article class=\"ds-sheet\"><h2>Ledger</h2><p>Deposit <span class=\"ds-gap\"></span> received.</p><button class=\"ds-sheet-btn\">Close</button></article>",
+      "css": ".ds-sheet { width:min(64ch,100%); padding:clamp(22px,4vw,44px); background:var(--paper); color:var(--ink); font-family:'Courier Prime','Courier New',monospace; } .ds-sheet h2 { margin:0 0 18px; font-weight:600; } .ds-gap { display:inline-block; width:3.4em; height:.9em; background:var(--ink); vertical-align:-.08em; } .ds-sheet-btn { background:var(--ink); color:var(--paper); font:inherit; font-weight:600; padding:0.72em 1.15em; border:0; border-radius:0; cursor:pointer; transition:background .18s, color .18s, transform .18s cubic-bezier(0.2,0.7,0.1,1); } .ds-sheet-btn:hover, .ds-sheet-btn:focus-visible { background:var(--blood); color:var(--bone); } .ds-sheet-btn:focus-visible { outline:2px solid var(--amber); outline-offset:3px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "El oído en sección",
+    "overview": "**Estado.** Este documento registra lo construido, no un acabado aprobado. La disposición de la revisión final sigue siendo **rebuild**, pendiente de las once imágenes de ChatGPT descritas en `ASSETS_TO_GENERATE.md`. Hoy existen 0 de 11: `public/assets/plates/` no existe y toda escena cae al 3D en tiempo real. Por eso las reglas de interfaz, tipo, color y luz son firmes, mientras que el acabado de imagen de las escenas es provisional. Revisa este documento cuando las placas entren.\n\nLa pieza es un corte anatómico de un edificio de hormigón que funciona como un oído, acompañado de su registro taquigráfico. Sobre un fondo casi negro hay una sola voz tipográfica, una lámpara motivada en cada escena y un naranja que solo aparece cuando algo está vivo. La interfaz no decora la historia: la transcribe.\n\nLa densidad es mínima. Cada pantalla sostiene una frase grande o una imagen encuadrada y, al pie, el registro de lo ocurrido. El movimiento pertenece a la cámara, que tiene peso, respiración y paso; la interfaz casi no se mueve. La pantalla de título ya lo declara: una línea de señal real ocupa el lugar de una palabra, y lo que la pieza dice de quien la visita está medido. La ausencia también se diseña: una marca inalcanzable no se apaga, simplemente no existe.\n\nSe rechazan la casa encantada de pasillo oscuro y la landing de Halloween, y el compromiso de marca excluye Halloween de fiesta, calaveras, monstruos decorativos, sustos repetidos y neón.",
+    "keyCharacteristics": [
+      "Negro casi puro, texto color hueso y acento reservado para lo vivo.",
+      "Una sola familia neogrotesca, apretada, con Courier solo para la máquina de Ruano.",
+      "Formato cinemático 2.39:1 con el registro dentro de la barra inferior.",
+      "Rectángulos planos para leer y actuar; círculos solo para marcas y controles físicos.",
+      "Movimiento de cámara con peso; la interfaz solo aparece y se desvanece."
+    ],
+    "rules": [
+      {
+        "name": "The Live Ember Rule",
+        "body": "Ember significa que algo está ocurriendo ahora o que el sistema lo registró como cierto. Nunca decora, nunca titula y nunca es el estado de reposo de un control.",
+        "section": "colors"
+      },
+      {
+        "name": "The Measured Signal Rule",
+        "body": "La señal es Bone mientras no haya medición, aunque ondule, y pasa a Amber solo cuando el micrófono mide nivel real (más de 0.02). Amber en la tira nunca se concede sin esa medición.",
+        "section": "colors"
+      },
+      {
+        "name": "The Not All At Once Rule",
+        "body": "Ninguna pantalla usa toda la paleta. Violet y Blood viven en estados de interacción, y la atmósfera de cada capítulo la aporta su propia luz.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ruano's Machine Rule",
+        "body": "Courier Prime solo aparece en lo que salió de la máquina de Ruano: la caja, el libro, la carta y la transcripción. El parecido entre esos papeles es parte de la trama, así que usarlo para ambientar destruye una pista.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tight Voice Rule",
+        "body": "El tracking se aprieta al crecer el tamaño, de -0.005em en Body a -0.04em en Poster. El peso solo salta de 400 a 600; no hay pesos intermedios en la jerarquía.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Motivated Lamp Rule",
+        "body": "Cada escena tiene una fuente principal física que justifica lo visible. Las luces de relleno, luna y hemisferio la sostienen a baja intensidad sin competir con ella; la espiral se reduce a la luz que sigue a quien camina y al trazo de la onda.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Physical Grade Rule",
+        "body": "Exposición, grano, franja cromática y fuga de luz se controlan desde un único grado. Sobre un grano base mínimo (0.012), los picos responden a hechos de la historia o a la Inclinación: grano de 0.3 en eventos y fuga ligada al progreso. Nada de esto se aplica a la interfaz.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Plate Over Blockout Rule",
+        "body": "Una placa de 3:2 cuelga delante de su nodo y cubre el 3D, mientras luz, polvo, lluvia y marcas siguen vivos. Sobre una placa el giro queda limitado a 0.14 y 0.08 rad, y salir de ella es un fundido por negro.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** reserva Ember para lo vivo y lo registrado, y Amber para la respuesta y la voz, según **The Live Ember Rule**.",
+      "**Do** ancla los controles de escena a la barra con `calc(var(--bar) + …)` y deja el registro sin obstruir.",
+      "**Do** da a cada marca un área de 48px y a todo gesto una alternativa por teclado, como Space en el control de sostener.",
+      "**Do** usa velos neutros y halos oscuros cuando el texto caiga sobre imagen viva; la legibilidad gana a la pureza.",
+      "**Do** resuelve cada transición entre capítulos con cámara o fundido por exposición y respeta el modo de movimiento reducido, que reduce animaciones a 0.01ms y sustituye vuelos por fundidos.",
+      "**Do** motiva cada escena con una fuente física visible, y acepta un clima propio por capítulo: niebla azul fría en La sala, ámbar en La grabación, azul casi negro en La habitación imposible y violeta con brillo carmesí en El otro lado.",
+      "**Do** quita una marca inalcanzable por completo: la ausencia está diseñada."
+    ],
+    "donts": [
+      "**Don't** uses Courier Prime fuera de los papeles de la máquina de Ruano.",
+      "**Don't** añadas `box-shadow`, degradados decorativos ni bordes de contenedor a la interfaz. El velo vertical en pantallas verticales existe para leer el registro, no como estilo.",
+      "**Don't** redondees rectángulos ni uses círculos para algo que no sea un punto o un control físico.",
+      "**Don't** añadas flourish de interfaz: nada de rebotes, parallax decorativo o bucles aparte de la marca y la señal.",
+      "**Don't** presentes como medido lo que no se midió: la frase o el color que afirmen algo de quien visita necesitan un dato real.",
+      "**Don't** hagas clicable lo que no tiene consecuencia narrativa.",
+      "**Don't** uses Halloween de fiesta, calaveras, monstruos decorativos, sustos repetidos, estroboscopia ni neón.",
+      "**Don't** hagas depender un evento de un solo sentido: todo sonido tiene su equivalente en texto o imagen."
+    ]
+  }
+}

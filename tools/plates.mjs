@@ -4,9 +4,9 @@ import { chromium } from '@playwright/test'
 import { mkdirSync } from 'node:fs'
 
 const out = 'docs/plate-refs'
-const FOV = 1.3 // keep in step with PLATE_FOV in src/render/stage.ts
+const FOV = 1.45 // keep in step with PLATE_FOV in src/render/stage.ts
 mkdirSync(out, { recursive: true })
-const browser = await chromium.launch({ executablePath: '/usr/bin/brave', headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] })
+const browser = await chromium.launch({ executablePath: '/usr/bin/brave', headless: true, args: ['--use-angle=gl-egl', '--ignore-gpu-blocklist'] })
 const page = await browser.newPage({ viewport: { width: 1536, height: 1024 } })
 await page.goto('http://localhost:5199/?fast')
 await page.locator('.enter .btn').last().click()

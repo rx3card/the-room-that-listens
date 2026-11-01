@@ -209,6 +209,9 @@ export function shadowed<L extends THREE.SpotLight | THREE.PointLight | THREE.Di
   light.shadow.camera.far = far
   light.shadow.bias = -0.0006
   light.shadow.normalBias = 0.03
+  // these rooms do not move, and a flicker changes intensity only: render the map once
+  light.shadow.autoUpdate = false
+  light.shadow.needsUpdate = true
   return light
 }
 

@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import type { Quality } from '../../../core/quality'
+import { t } from '../../../core/i18n'
 import { clamp, smooth } from '../../../core/tween'
 import { canvasTexture, dust, lathe, model, pbr, sharedDispose, shadowed, v3, type Built, type Live } from '../../../render/kit'
 
@@ -77,8 +78,12 @@ function membrane() {
       uniform float uPush,uTaut; varying vec2 vP; varying float vB;
       float n(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
       float vn(vec2 p){ vec2 i=floor(p),f=fract(p); f=f*f*(3.-2.*f); return mix(mix(n(i),n(i+vec2(1,0)),f.x),mix(n(i+vec2(0,1)),n(i+vec2(1,1)),f.x),f.y); }
+      float fb(vec2 p){ float v=0.,a=.5; for(int i=0;i<6;i++){ v+=a*vn(p); p=p*2.1+3.7; a*=.5; } return v; }
       void main(){ float r=length(vP)/2.05;
-        float v=vn(vP*3.)*.5+vn(vP*9.)*.3+vn(vP*vec2(2.,28.))*.2;
+        // veins are the ridges of a warped noise field; pores come from the finest octaves
+        vec2 q=vP*1.4+vec2(fb(vP*1.2),fb(vP*1.2+5.))*1.6;
+        float vein=pow(1.-abs(fb(q)*2.-1.),9.);
+        float v=fb(vP*6.)*.9-vein*.22;
         vec3 skin=mix(vec3(.012,.0065,.004),vec3(.05,.027,.014),v);
         vec3 light=vec3(1.,.5,.18)*(.004+uTaut*.03+uPush*2.2)*(1.-r*r)*(1.+v);
         gl_FragColor=vec4(skin*(.8+uPush*3.)+light,1.); }`,
@@ -127,7 +132,7 @@ export async function buildWax(q: Quality): Promise<Built> {
     upright.setMatrixAt(i, gap(a) ? new THREE.Matrix4().makeScale(0, 0, 0) : m)
   }
   scene.add(upright)
-  const palette = ['#6e3f1a', '#54301a', '#8a5a26', '#3b2110', '#9a6c2a', '#8c7350']
+  const palette = ['#4c3322', '#3a281c', '#5e4630', '#2a1e16', '#6a5238', '#6d604c']
   let n = 0
   let seq = 0
   const rng = (i: number) => Math.abs(Math.sin(i * 12.9898) * 43758.5453) % 1 // same room on every visit
@@ -148,14 +153,15 @@ export async function buildWax(q: Quality): Promise<Built> {
   // The table at the centre of the room.
   const top = new THREE.Mesh(new THREE.CylinderGeometry(1.3, 1.3, 0.07, 48), pbr('plank', [1, 1], { color: '#4b2f1c', roughness: 0.45 }))
   top.position.y = 0.92
-  top.receiveShadow = true // the table's own shadow reads as a rug from this height
+  top.receiveShadow = true // the table's own shadow reads as a rug from this height  taste-skill-ignore
   const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.34, 0.9, 16), pbr('plank', [1, 1], { color: '#2f1e13' }))
   leg.position.y = 0.45
   scene.add(top, leg)
 
   const ph = phonograph()
-  ph.group.position.set(0.1, 0.95, 0.1)
+  ph.group.position.set(0.05, 0.95, 0.05)
   ph.group.rotation.y = 0.55
+  ph.group.scale.setScalar(0.78) // the horn must clear the table's edge
   scene.add(ph.group)
 
   const [lampS, deskS, chairS] = await Promise.all([model('oil-lamp'), model('desk'), model('chair')])
@@ -163,7 +169,7 @@ export async function buildWax(q: Quality): Promise<Built> {
   lampS.scale.setScalar(1.2)
   scene.add(lampS)
 
-  const lamp = shadowed(new THREE.PointLight('#ffa35a', 46, 28, 1.45), q, 0.1, 26)
+  const lamp = shadowed(new THREE.PointLight('#ffb27a', 46, 28, 1.45), q, 0.1, 26)
   lamp.position.set(-0.68, 1.36, -0.34)
   scene.add(lamp)
   const flame = new THREE.Mesh(new THREE.SphereGeometry(0.03, 12, 8), new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffb36b').multiplyScalar(22) }))
@@ -182,25 +188,37 @@ export async function buildWax(q: Quality): Promise<Built> {
   chairS.position.set(0.7, 0, 6.9)
   chairS.rotation.y = 2.5
   scene.add(deskGroup, chairS)
-  const paper = (w: number, h: number, draw: (c: CanvasRenderingContext2D) => void) =>
-    new THREE.Mesh(new THREE.PlaneGeometry(w, h).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ map: canvasTexture(420, 300, draw), roughness: 0.8 }))
-  const ink = (lines: number) => (c: CanvasRenderingContext2D) => {
-    c.fillStyle = '#c9bb9c'
-    c.fillRect(0, 0, 420, 300)
-    c.fillStyle = '#2b241a'
-    for (let i = 0; i < lines; i++) c.fillRect(30, 26 + i * 20, 200 + Math.random() * 150, 3)
+  // Real writing, in the visitor's language. Papers draw above any plate, so a painted desk can stay blank.
+  const paper = (w: number, h: number, title: string, body: string, face: string) => {
+    const cv = canvasTexture(1024, Math.round((1024 * h) / w), c => {
+      c.fillStyle = '#b9ad93'
+      c.fillRect(0, 0, 1024, 1024)
+      c.fillStyle = '#231c12'
+      c.font = `600 44px ${face}`
+      c.fillText(title, 56, 90)
+      c.font = `34px ${face}`
+      let y = 160
+      for (const para of body.replaceAll('__', '      ').split('\n')) {
+        let line = ''
+        for (const word of para.split(' ')) {
+          if (c.measureText(`${line} ${word}`).width > 900) {
+            c.fillText(line, 56, y)
+            y += 46
+            line = word
+          } else line = line ? `${line} ${word}` : word
+        }
+        c.fillText(line, 56, y)
+        y += 46
+      }
+    })
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h).rotateX(-Math.PI / 2).rotateY(Math.PI), new THREE.MeshStandardMaterial({ map: cv, roughness: 0.85, transparent: true }))
+    m.renderOrder = 2
+    return m
   }
-  const ledger = paper(0.46, 0.33, ink(13))
-  const notebook = paper(0.26, 0.2, ink(9))
-  const cut = paper(0.2, 0.28, c => {
-    c.fillStyle = '#b9ad93'
-    c.fillRect(0, 0, 420, 300)
-    c.strokeStyle = '#201a12'
-    c.lineWidth = 3
-    c.beginPath()
-    c.ellipse(190, 150, 90, 120, 0.2, 0, 7)
-    c.stroke()
-  })
+  const ledger = paper(0.46, 0.33, t('doc.ledger.t'), t('doc.ledger.b'), '"Courier Prime", monospace')
+  const notebook = paper(0.26, 0.2, t('doc.notebook.t'), t('doc.notebook.b'), '"Host Grotesk Variable", sans-serif')
+  const cut = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.3).rotateX(-Math.PI / 2).rotateY(Math.PI), new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load(`${import.meta.env.BASE_URL}assets/img/gray-ear.png`, x => void (x.colorSpace = THREE.SRGBColorSpace)), roughness: 0.85, transparent: true }))
+  cut.renderOrder = 2
   ledger.position.set(-0.35, 0.79, 7.9)
   notebook.position.set(0.2, 0.79, 7.72)
   notebook.rotation.y = 0.2
@@ -263,13 +281,13 @@ export async function buildWax(q: Quality): Promise<Built> {
 
   const b: Built = {
     scene,
-    exposure: 1.7,
+    exposure: 1.9,
     bloom: 0.3,
     nodes: {
       top: { pos: v3(-5.8, H + 1.8, 0), look: v3(-1, 0.8, 0), fov: 60 },
       floor: { pos: v3(-4.6, 1.6, -3.3), look: v3(0.2, 1.3, 0.3), fov: 58, range: [1.5, 0.45] },
       shelf: { pos: v3(1.6, 1.6, -5.2), look: v3(3.4, 2.1, -9.2), fov: 40, range: [0.5, 0.3] },
-      phonograph: { pos: v3(1.2, 1.55, 1.55), look: v3(0.1, 1.15, 0.1), fov: 38, range: [0.25, 0.15] },
+      phonograph: { pos: v3(1.2, 1.55, 1.55), look: v3(0.1, 1.15, 0.1), fov: 38, range: [0.25, 0.15], exposure: 0.42 },
       desk: { pos: v3(0.05, 1.68, 6.5), look: v3(0.05, 0.75, 7.9), fov: 42, range: [0.4, 0.25] },
       relay: { pos: v3(-6.6, 1.75, 0), look: v3(-9.2, 1.8, 0), fov: 42, range: [0.3, 0.2] },
       skin: { pos: v3(5.2, 1.9, 0), look: v3(9, 2.3, 0), fov: 58, range: [0.35, 0.3] },

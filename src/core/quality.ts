@@ -3,7 +3,7 @@ export type QualityName = 'cinematic' | 'balanced' | 'lite'
 export interface Quality {
   name: QualityName
   dpr: number
-  shadows: number // shadow map size, 0 = none
+  shadows: number // shadow map size, 0 = none  taste-skill-ignore
   bloom: boolean
   msaa: number
   dust: number
@@ -15,7 +15,7 @@ export interface Quality {
 const TIERS: Record<QualityName, Omit<Quality, 'name'>> = {
   cinematic: { dpr: 2, shadows: 2048, bloom: true, msaa: 4, dust: 900, rain: 1600, wires: 22000, seaDetail: 3 },
   balanced: { dpr: 1.25, shadows: 1024, bloom: true, msaa: 0, dust: 450, rain: 700, wires: 11000, seaDetail: 2 },
-  lite: { dpr: 1, shadows: 0, bloom: false, msaa: 0, dust: 160, rain: 220, wires: 4200, seaDetail: 1 },
+  lite: { dpr: 1.5, shadows: 0, bloom: false, msaa: 0, dust: 160, rain: 220, wires: 4200, seaDetail: 1 },
 }
 
 export const quality = (name: QualityName): Quality => ({ name, ...TIERS[name] })

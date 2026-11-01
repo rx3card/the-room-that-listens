@@ -16,11 +16,11 @@ const seat = (i: number) => {
   return { x: (col - 3) * 2.4 + (row % 2) * 0.9 + Math.sin(i * 7.3) * 0.25, z: 6 + row * 2.7 + Math.cos(i * 3.1) * 0.25, ry: Math.PI + Math.sin(i * 9.7) * 0.16 }
 }
 
-export async function buildOther(q: Quality, fallen: number[]): Promise<Built> {
+export async function buildOther(q: Quality, fallen: number[], lines: string[]): Promise<Built> {
   const scene = new THREE.Scene()
   scene.fog = new THREE.FogExp2('#0b0512', 0.009)
 
-  const dome = sky({ zenith: '#07040e', horizon: '#261231', glow: '#c23320', glowDir: v3(0.1, 0.0, -1), glowSize: 60, stars: 0, clouds: 0.75, mirror: true })
+  const dome = sky({ zenith: '#07040e', horizon: '#1a0c24', glow: '#a32a2a', glowDir: v3(0.1, 0.0, -1), glowSize: 60, stars: 0, clouds: 0.75, mirror: true })
   scene.add(dome)
 
   const [chairS, lampS, deskS, radioS] = await Promise.all([model('chair'), model('hanging-lamp'), model('desk'), model('radio')])
@@ -125,16 +125,32 @@ export async function buildOther(q: Quality, fallen: number[]): Promise<Built> {
     new THREE.PlaneGeometry(0.3, 0.36),
     new THREE.MeshStandardMaterial({
       roughness: 0.9,
-      map: canvasTexture(300, 360, c => {
+      transparent: true,
+      // the page in the machine is what the visitor has actually done tonight
+      map: canvasTexture(900, 1080, c => {
         c.fillStyle = '#d7cdb8'
-        c.fillRect(0, 0, 300, 360)
+        c.fillRect(0, 0, 900, 1080)
         c.fillStyle = '#1b1712'
-        for (let i = 0; i < 17; i++) c.fillRect(24, 22 + i * 19, 120 + (i * 83) % 130, 3)
+        c.font = '30px "Courier Prime", monospace'
+        let y = 70
+        for (const text of lines.slice(-14)) {
+          let line = ''
+          for (const word of text.split(' ')) {
+            if (c.measureText(`${line} ${word}`).width > 800) {
+              c.fillText(line, 50, y)
+              y += 38
+              line = word
+            } else line = line ? `${line} ${word}` : word
+          }
+          c.fillText(line, 50, y)
+          y += 56
+        }
       }),
     }),
   )
   sheet.position.set(0, 0.34, 0.14)
   sheet.rotation.x = -0.28
+  sheet.renderOrder = 2
   steno.add(body, platen, sheet)
   steno.position.set(0.1, 0.77, 13.05)
   scene.add(deskS, steno)
@@ -144,13 +160,13 @@ export async function buildOther(q: Quality, fallen: number[]): Promise<Built> {
   scene.add(radioS)
 
   const standMat = new THREE.MeshStandardMaterial({ color: '#14100e', metalness: 0.6, roughness: 0.6 })
-  const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 2.1, 8), standMat)
-  stand.position.set(0.72, 1.05, 13.4)
+  const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 2.4, 8), standMat)
+  stand.position.set(1.5, 1.2, 14.1)
   lampS.scale.setScalar(0.7)
-  lampS.position.set(0.5, 1.9, 13.2)
+  lampS.position.set(1.3, 2.3, 14.1)
   scene.add(stand, lampS)
-  const lampLight = shadowed(new THREE.SpotLight('#ffaa55', 46, 22, 1.25, 0.8, 1.7), q, 0.3, 24)
-  lampLight.position.set(0.5, 1.95, 13.2)
+  const lampLight = shadowed(new THREE.SpotLight('#ffb27a', 13, 22, 1.25, 0.8, 1.7), q, 0.3, 24)
+  lampLight.position.set(1.0, 2.3, 14.2)
   lampLight.target.position.set(0.1, 0.7, 13)
   scene.add(lampLight, lampLight.target)
 
@@ -162,13 +178,13 @@ export async function buildOther(q: Quality, fallen: number[]): Promise<Built> {
 
   return {
     scene,
-    exposure: 1.5,
+    exposure: 2,
     bloom: 0.55,
     nodes: {
       high: { pos: v3(0, 70, 38), look: v3(0, 0, -30), fov: 62 },
       shore: { pos: v3(-1.5, 1.3, 27.5), look: v3(0, 1.5, -20), fov: 46, range: [0.9, 0.3] },
       rows: { pos: v3(1.6, 1.6, 21), look: v3(0.2, 0.9, 12), fov: 52, range: [1.1, 0.35] },
-      desk: { pos: v3(0.1, 1.62, 14.25), look: v3(0.1, 0.92, 12.9), fov: 44, range: [0.6, 0.3] },
+      desk: { pos: v3(0.1, 1.62, 14.25), look: v3(0.1, 0.92, 12.9), fov: 44, range: [0.6, 0.3], exposure: 0.42 },
     },
     anchors: {
       chairs: v3(-2.4, 1.4, 22),
@@ -180,7 +196,7 @@ export async function buildOther(q: Quality, fallen: number[]): Promise<Built> {
       ;(dome.material as THREE.ShaderMaterial).uniforms.uT.value = t
       ;(water.material as THREE.ShaderMaterial).uniforms.uT.value = t
       ;(motes.material as THREE.ShaderMaterial).uniforms.uT.value = t
-      lampLight.intensity = (1 - live.lean * 0.6) * 46
+      lampLight.intensity = (1 - live.lean * 0.6) * 13
     },
     event() {},
     dispose() {

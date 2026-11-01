@@ -24,7 +24,9 @@ class Grade extends Effect {
         c=mix(c,c*vec3(.86,.96,1.08)+vec3(.0016,.0022,.0034),smoothstep(.22,.0,l));
         c=mix(c,c*vec3(1.05,1.,.93),smoothstep(.2,.9,l));
         c+=vec3(1.,.42,.1)*uLeak*smoothstep(.2,1.,uv.x)*.2;
-        c=aces(c);
+        // per-channel ACES turns amber to lemon; hold the hue by blending in a luminance-based curve
+        float L0=max(dot(c,vec3(.2126,.7152,.0722)),1e-4);
+        c=mix(aces(c),clamp(c*(aces(vec3(L0)).r/L0),0.,1.),.65);
         float g=r(gl_FragCoord.xy*.731+fract(uTime*7.13)*97.)-.5;
         c+=g*(.012+uGrain*.07)*(1.-dot(c,vec3(.33))*.6);
         outputColor=vec4(c,1.);
@@ -47,7 +49,7 @@ class Grade extends Effect {
 }
 
 // References are shot this much wider than a node's field of view, in ChatGPT's 3:2, so a plate covers any screen.
-export const PLATE_FOV = 1.3
+export const PLATE_FOV = 1.45
 export const PLATE_ASPECT = 1.5
 
 export class Stage {
@@ -115,9 +117,9 @@ export class Stage {
     if (this.ao) {
       this.ao.configuration.aoRadius = 1.6
       this.ao.configuration.distanceFalloff = 0.8
-      this.ao.configuration.intensity = 3.2
+      this.ao.configuration.intensity = 2.2
       this.ao.configuration.gammaCorrection = false
-      this.ao.setQualityMode(this.q.name === 'cinematic' ? 'Medium' : 'Performance')
+      this.ao.setQualityMode(this.q.name === 'cinematic' ? 'High' : 'Low') // Performance mode leaves visible mottle at rest
       this.composer.addPass(this.ao)
     }
     this.grade = new Grade()
@@ -228,6 +230,7 @@ export class Stage {
     mesh.renderOrder = 1
     b.scene.add(mesh)
     this.plate = mesh
+    if (this.ao) this.ao.enabled = false // a painting carries its own contact shadows
     void this.tweens.to(1.2, k => ((mesh.material as THREE.MeshBasicMaterial).opacity = k))
   }
 
@@ -235,6 +238,7 @@ export class Stage {
     const m = this.plate
     if (!m) return
     this.plate = undefined
+    if (this.ao) this.ao.enabled = true
     const mat = m.material as THREE.MeshBasicMaterial
     const from = mat.opacity
     void this.tweens.to(dur, k => (mat.opacity = from * (1 - k))).then(() => {
@@ -248,10 +252,11 @@ export class Stage {
     const b = this.built
     if (!b) return
     const n = b.nodes[name]
-    if (this.reduced) {
-      await this.fadeTo(0, 0.4)
+    // a plate has no 3D worth walking through, so leaving one dissolves through dark
+    if (this.reduced || this.plate) {
+      await this.fadeTo(0, 0.45)
       this.jump(name)
-      await this.fadeTo(1, 0.4)
+      await this.fadeTo(1, 0.7)
       return
     }
     this.hidePlate(0.5)
@@ -327,7 +332,8 @@ export class Stage {
     const b = this.built
     if (b) {
       b.update(this.t, dt, this.live)
-      if (this.plate) (this.plate.material as THREE.MeshBasicMaterial).color.setScalar((b.light?.() ?? 1) * 0.72)
+      // cancel this view's exposure so the painting arrives as painted; 0.72 sits it under the tone curve
+      if (this.plate) (this.plate.material as THREE.MeshBasicMaterial).color.setScalar(((b.light?.() ?? 1) * 0.72) / (b.exposure * this.nodeExposure))
       this.nodeExposure += ((this.node?.exposure ?? 1) - this.nodeExposure) * Math.min(1, dt * 1.5)
       this.grade.set('uExposure', b.exposure * this.nodeExposure * this.fade)
       this.grade.set('uGrain', this.grain + this.live.lean * 0.5)
@@ -350,7 +356,7 @@ export class Stage {
     this.frames.length = 0
     this.fps = 1 / avg
     if (!this.adaptive || this.fps > 32) return
-    if (this.dprScale > 0.6) {
+    if (this.dprScale > 0.8) {
       this.dprScale -= 0.2
       this.resize()
     } else if (this.q.name !== 'lite') {

@@ -11,7 +11,7 @@ mkdirSync(out, { recursive: true })
 const browser = await chromium.launch({
   executablePath: '/usr/bin/brave',
   headless: true,
-  args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
+  args: process.env.GPU ? ['--use-angle=gl-egl', '--ignore-gpu-blocklist', '--enable-gpu-rasterization'] : ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
 })
 const page = await browser.newPage({ viewport: { width: w, height: h }, hasTouch: w < 500 })
 const errors = []
@@ -22,7 +22,7 @@ const idle = () => page.waitForFunction(() => window.room?.dir && !room.dir.busy
 const clean = () => page.evaluate(() => document.querySelector('.chapter')?.remove())
 const shot = async name => {
   await clean()
-  await page.waitForTimeout(700)
+  await page.waitForTimeout(2600) // long enough for the frame counter to see only this view
   await page.screenshot({ path: `${out}/${name}.png` })
   console.log(name, await page.evaluate(() => `fps ${Math.round(room.stage?.fps ?? 0)} ${room.dir?.state.scene}/${room.dir?.state.node}`))
 }
@@ -50,6 +50,7 @@ const go = async id => {
 }
 
 await page.goto(url)
+console.log('renderer', await page.evaluate(() => { const g = document.createElement('canvas').getContext('webgl2'); const e = g?.getExtension('WEBGL_debug_renderer_info'); return e ? g.getParameter(e.UNMASKED_RENDERER_WEBGL) : 'none' }))
 await page.waitForTimeout(900)
 await page.screenshot({ path: `${out}/title.png` })
 await page.locator('.enter .btn').last().click()
