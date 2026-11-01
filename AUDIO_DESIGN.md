@@ -2,12 +2,25 @@
 
 La idea central: **el sonido que se niega**. Ves el mar romper contra el cabo y no lo oyes. Ese mar solo vuelve en un final, el único en el que dejas de escuchar.
 
+## Música
+
+Suena desde la portada. Los navegadores no permiten audio hasta el primer gesto, así que arranca con el primer toque o tecla en cualquier punto, o con *Activar sonido*; *Entrar en silencio* no la dispara. La línea de la señal del título reacciona a lo que suena.
+
+| Momento | Pista de SINIUS |
+| --- | --- |
+| Portada, última señal | Disembodied Consciousness |
+| La llamada | Ectenic Force |
+| I | Cryptid Sightings |
+| II | Feeling Watched |
+| III | Sensory Deprivation |
+| IV | Perceptual Isolation |
+
 ## Capas por escena
 
 | Escena | Sala (reverberación) | Capas |
 | --- | --- | --- |
 | La llamada | Casi nula, «sorda» | Mar real, viento sintético. El mar cae a cero al llegar a la costa |
-| I. La sala | Casi nula | Lluvia real, drone de 41 Hz, zumbido de lámpara posicionado en el pilar. Con las copas puestas: filtro de paso bajo y grabación de Sullivan de 1888 |
+| I. La sala | Casi nula | Música, lluvia real, drone de 41 Hz, zumbido de lámpara posicionado en el pilar. Con las copas puestas: filtro de paso bajo y grabación de Sullivan de 1888 |
 | II. La grabación | 1,7 s, cálida | Drone triangular, «Feeling Watched», voces de 1890 posicionadas tras los estantes, casi inaudibles |
 | III. Espiral | 5,5 s, inmensa | Banda estrecha que baja de 3,2 kHz a 160 Hz según avanzas, como una cóclea, «Sensory Deprivation», pasos reales en HRTF |
 | IV. El otro lado | 3,4 s, oscura | Viento real de Marte a 0,7 de velocidad, «Perceptual Isolation», drone de 33 Hz |

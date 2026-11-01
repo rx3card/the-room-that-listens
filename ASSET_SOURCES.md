@@ -18,10 +18,13 @@ Todo lo que no es código propio. Descarga y conversión reproducibles con `node
 
 ## Música
 
-SINIUS, *The Silence Before the Haunting*, CC BY 4.0, [Free Music Archive](https://freemusicarchive.org/music/sinius/the-silence-before-the-haunting). Primeros 150 s, en mono a 72 kbps, como fondo a nivel bajo.
+SINIUS, *The Silence Before the Haunting*, CC BY 4.0, [Free Music Archive](https://freemusicarchive.org/music/sinius/the-silence-before-the-haunting). Primeros 150 s, en estéreo a 96 kbps, normalizados a -16 LUFS y con un fundido final para que el bucle no salte.
 
 | Pista | Capítulo | Ruta |
 | --- | --- | --- |
+| Disembodied Consciousness | Portada y última señal | `music-title.mp3` |
+| Ectenic Force | La llamada | `music-call.mp3` |
+| Cryptid Sightings | I | `music-hall.mp3` |
 | Feeling Watched | II | `music-feeling-watched.mp3` |
 | Sensory Deprivation | III | `music-sensory-deprivation.mp3` |
 | Perceptual Isolation | IV | `music-perceptual-isolation.mp3` |

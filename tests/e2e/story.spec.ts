@@ -36,6 +36,16 @@ test('no audio context exists before a gesture', async ({ page }) => {
   expect(await page.evaluate(() => room.audio.ctx === undefined)).toBe(true)
 })
 
+test('the first touch starts the music, but not when asking for silence', async ({ page }) => {
+  await page.goto('/?fast')
+  await page.mouse.click(700, 300)
+  await page.waitForFunction(() => room.audio.ctx?.state === 'running' && !room.audio.muted)
+  await page.waitForFunction(() => room.audio.level() > 0, null, { timeout: 15_000 }) // the file really decoded and plays
+  await page.goto('/?fast')
+  await page.getByRole('button', { name: /silence/i }).click()
+  expect(await page.evaluate(() => room.audio.muted)).toBe(true)
+})
+
 test('the title links to the source code', async ({ page }) => {
   await page.goto('/?fast')
   await expect(page.getByRole('link', { name: 'Source code' })).toHaveAttribute('href', 'https://github.com/rx3card/the-room-that-listens')
@@ -123,6 +133,7 @@ test('menu pauses, opens the archive, and Escape closes it', async ({ page }) =>
   expect(await page.evaluate(() => room.stage.paused)).toBe(true)
   await page.getByRole('button', { name: 'Archives & Credits' }).click()
   await expect(page.getByRole('heading', { name: 'Register of Deposits' })).toBeVisible()
+  expect(await page.locator('.archive').evaluate(e => getComputedStyle(e).scrollbarWidth)).toBe('thin')
   await page.getByRole('button', { name: 'Back' }).click()
   await page.keyboard.press('Escape')
   expect(await page.evaluate(() => room.stage.paused)).toBe(false)
@@ -171,6 +182,6 @@ test('phone layout does not scroll sideways', async ({ browser }) => {
   await page.goto('/?fast')
   const over = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)
   expect(over).toBeLessThanOrEqual(0)
-  await expect(page.getByRole('button', { name: /sound/i })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Enter with sound' })).toBeVisible()
   await ctx.close()
 })

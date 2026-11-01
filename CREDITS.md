@@ -15,7 +15,7 @@ The same list lives inside the experience as the Register of Deposits (Archives 
 
 ## Music
 
-SINIUS, *The Silence Before the Haunting*: Feeling Watched, Sensory Deprivation, Perceptual Isolation. CC BY 4.0. https://freemusicarchive.org/music/sinius/the-silence-before-the-haunting
+SINIUS, *The Silence Before the Haunting*: Disembodied Consciousness, Ectenic Force, Cryptid Sightings, Feeling Watched, Sensory Deprivation, Perceptual Isolation. CC BY 4.0. https://freemusicarchive.org/music/sinius/the-silence-before-the-haunting
 
 ## Images
 

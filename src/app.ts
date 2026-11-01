@@ -72,10 +72,18 @@ export class App implements Host {
     document.documentElement.classList.toggle('reduced', !!this.data.settings.reduced)
     this.watchVisitor()
     this.title()
+    // browsers keep a page silent until the first gesture, so the music starts on the first touch anywhere
+    const first = (e: Event) => {
+      removeEventListener('pointerdown', first)
+      removeEventListener('keydown', first)
+      if (!(e.target as Element).closest?.('[data-quiet]')) this.titleMusic(true)
+    }
+    addEventListener('pointerdown', first)
+    addEventListener('keydown', first)
     const loop = (ms: number) => {
       this.time = ms / 1000
       this.ear.update()
-      this.strip.draw(this.time, this.ear.level)
+      this.strip.draw(this.time, Math.max(this.ear.level, this.audio.level()))
       if (!this.stage) requestAnimationFrame(loop)
     }
     requestAnimationFrame(loop)
@@ -99,6 +107,10 @@ export class App implements Host {
       b.lang = code
       langs.append(b)
     }
+    const playing = !!this.audio.ctx && !this.audio.muted
+    const sound = button(t(playing ? 'title.soundOff' : 'title.soundOn'), 'link soundbtn', () => this.titleMusic(this.audio.muted))
+    sound.dataset.quiet = ''
+    sound.setAttribute('aria-pressed', String(playing))
     const webgl = hasWebGL()
     const main = el(
       'main',
@@ -116,13 +128,27 @@ export class App implements Host {
       ),
     )
     root.append(
-      el('header', {}, el('span', { textContent: 'Punta Sorda, 2026' }), langs),
+      el('header', {}, el('span', { textContent: 'Punta Sorda, 2026' }), el('div', { cls: 'foot' }, sound, langs)),
       main,
       el('footer', {}, el('span', { textContent: t('title.headphones') }), el('div', { cls: 'foot' }, githubLink(t('title.source')), button(t('title.archive'), 'link', () => this.archive()))),
     )
     if (this.data.signal) this.strip.envelope = this.data.signal
     this.ui.append(root)
+    root.querySelectorAll<HTMLElement>('.enter .btn').forEach((b, _, all) => b === all[all.length - 1] && (b.dataset.quiet = ''))
     root.querySelector<HTMLElement>('.enter .btn')?.focus()
+  }
+
+  private titleMusic(on: boolean) {
+    if (this.started) return
+    const fresh = !this.audio.ctx
+    this.audio.unlock(!on)
+    if (fresh) this.audio.ambience('title')
+    this.audio.setMuted(!on)
+    const b = this.ui.querySelector('.soundbtn')
+    if (b) {
+      b.textContent = t(on ? 'title.soundOff' : 'title.soundOn')
+      b.setAttribute('aria-pressed', String(on))
+    }
   }
 
   private async enter(silent: boolean, resume = false) {
@@ -153,7 +179,12 @@ export class App implements Host {
     root.classList.add('out')
     setTimeout(() => root.remove(), 1500)
     this.menuButton()
-    if (!fresh) return void this.dir.resume()
+    if (!fresh) {
+      // a resumed story skips its scene's opening steps, so its music has to be restarted here
+      const step = this.dir.scene.enter.find(s => 'fx' in s && s.fx === 'ambience')
+      if (step && 'fx' in step) this.audio.ambience(step.data as Ambience)
+      return void this.dir.resume()
+    }
     if (this.data.lastAsked) this.rec.add('rec.returning', { name: this.data.lastAsked })
     if (this.data.signal) this.rec.add('rec.signalBack', { seconds: Math.round(this.data.signal.length / 20) })
     this.rec.add(silent ? 'rec.acceptsSilent' : 'rec.accepts')
@@ -203,7 +234,7 @@ export class App implements Host {
     if (this.stageName === 'spiral') this.audio.spiralDepth(clamp(-cam.position.y / 9))
     this.placeSpots()
     this.noticeVisitor()
-    if (this.ui.querySelector('.strip')) this.strip.draw(this.time += dt, this.ear.level)
+    if (this.ui.querySelector('.strip')) this.strip.draw((this.time += dt), Math.max(this.ear.level, this.audio.level()))
   }
 
   private placeSpots() {
@@ -757,7 +788,7 @@ export class App implements Host {
         if (!quiet) this.lastInput = performance.now()
         root.classList.toggle('fading', idle > 12)
         strip.gain = clamp(1 - idle / 41)
-        if (!this.stage) strip.draw((this.time += 0.05), this.ear.level)
+        if (!this.stage) strip.draw((this.time += 0.05), Math.max(this.ear.level, this.audio.level()))
         if (idle >= 41) finish('stop')
       }, 50)
     })

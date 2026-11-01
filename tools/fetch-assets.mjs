@@ -40,8 +40,11 @@ const COMMONS = [
   ['audio', 'Metal cabinet door jarring.ogg', 'audio/cabinet.mp3'],
 ]
 
-// Music from SINIUS, The Silence Before the Haunting (CC BY 4.0, Free Music Archive). Used as a low bed, first 150 s.
+// Music from SINIUS, The Silence Before the Haunting (CC BY 4.0, Free Music Archive). First 150 s, normalised so every chapter has the same weight, with a fade so the loop does not click.
 const MUSIC = {
+  "title": "https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/9fsIw7748cET3ZSCYl1njra3g6WRxDF3ifPJNVyJ.mp3",
+  "call": "https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/0DCOwwN3wMVI6a4iweO7nS06F4tlY4AblOiChmdx.mp3",
+  "hall": "https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/G0F1KIraoxxZWM2osleVB8DJSvAiysdPq2kyw4uu.mp3",
   "feeling-watched": "https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/p70DC0io1gFZvmxmtx2cD4wdLvJIozabSwojDsIc.mp3",
   "perceptual-isolation": "https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/Ax24J4CA2KvIYdMa9fw5hfNcUC0FztOtZ9W8xUHi.mp3",
   "sensory-deprivation": "https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/dWGcAmauxEbFd1dTD03fdQVAqmnWCCbi7uslNSTj.mp3"
@@ -116,7 +119,7 @@ async function music() {
     const raw = await get(url, join(SRC, 'music', `${name}.mp3`))
     const out = join(OUT, 'audio', `music-${name}.mp3`)
     if (done(out)) continue
-    run('ffmpeg', ['-y', '-loglevel', 'error', '-i', raw, '-t', '150', '-ac', '1', '-ar', '32000', '-b:a', '72k', out])
+    run('ffmpeg', ['-y', '-loglevel', 'error', '-i', raw, '-t', '150', '-af', 'loudnorm=I=-16:TP=-2,afade=t=out:st=146:d=4', '-ac', '2', '-ar', '44100', '-b:a', '96k', out])
     console.log('music', name)
   }
 }

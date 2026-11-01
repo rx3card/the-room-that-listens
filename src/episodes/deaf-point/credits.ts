@@ -22,6 +22,9 @@ export const recordings: Credit[] = [
 ]
 
 export const music: Credit[] = [
+  { title: 'Disembodied Consciousness', by: 'SINIUS, The Silence Before the Haunting', licence: 'CC BY 4.0', url: 'https://freemusicarchive.org/music/sinius/the-silence-before-the-haunting/disembodied-consciousness/' },
+  { title: 'Ectenic Force', by: 'SINIUS, The Silence Before the Haunting', licence: 'CC BY 4.0', url: 'https://freemusicarchive.org/music/sinius/the-silence-before-the-haunting/ectenic-force/' },
+  { title: 'Cryptid Sightings', by: 'SINIUS, The Silence Before the Haunting', licence: 'CC BY 4.0', url: 'https://freemusicarchive.org/music/sinius/the-silence-before-the-haunting/cryptid-sightings/' },
   { title: 'Feeling Watched', by: 'SINIUS, The Silence Before the Haunting', licence: 'CC BY 4.0', url: 'https://freemusicarchive.org/music/sinius/the-silence-before-the-haunting/feeling-watched/' },
   { title: 'Sensory Deprivation', by: 'SINIUS, The Silence Before the Haunting', licence: 'CC BY 4.0', url: 'https://freemusicarchive.org/music/sinius/the-silence-before-the-haunting/sensory-deprivation/' },
   { title: 'Perceptual Isolation', by: 'SINIUS, The Silence Before the Haunting', licence: 'CC BY 4.0', url: 'https://freemusicarchive.org/music/sinius/the-silence-before-the-haunting/perceptual-isolation/' },

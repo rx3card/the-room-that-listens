@@ -30,6 +30,15 @@ h1, h2, h3, p, ul, ol { margin: 0; padding: 0; font: inherit; list-style: none; 
 button, input, select { font: inherit; color: inherit; }
 button { background: none; border: 0; padding: 0; cursor: pointer; }
 a { color: inherit; text-underline-offset: 0.2em; }
+/* The browser's white scrollbar breaks the dark: every scrolling surface gets a thin one in the piece's own colours. */
+* { scrollbar-width: thin; scrollbar-color: var(--mineral) transparent; }
+.sheet { scrollbar-color: #8a8272 transparent; }
+@supports not (scrollbar-color: red red) {
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--mineral); }
+  .sheet::-webkit-scrollbar-thumb { background: #8a8272; }
+}
 :focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
 ::selection { background: var(--ember); color: var(--black); }
 
@@ -54,7 +63,7 @@ a { color: inherit; text-underline-offset: 0.2em; }
 .title main > :nth-child(2) { animation-delay: 0.09s; }
 .title main > :nth-child(3) { animation-delay: 0.18s; }
 .title main > :nth-child(n + 4) { animation-delay: 0.27s; }
-.title header { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; font-size: var(--small); }
+.title header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0 16px; font-size: var(--small); }
 .title main { align-self: center; }
 .sentence { display: flex; align-items: center; gap: 0.16em; font-size: var(--poster); font-weight: 600; line-height: 0.98; letter-spacing: -0.04em; white-space: nowrap; }
 .sentence .strip { flex: 1; min-width: 0.6em; height: 0.72em; display: block; }
@@ -67,6 +76,7 @@ a { color: inherit; text-underline-offset: 0.2em; }
 .foot { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
 .source { pointer-events: auto; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--bone); text-decoration: underline; text-underline-offset: 0.25em; text-decoration-thickness: 1px; }
 .source:hover { color: var(--amber); }
+.soundbtn { min-height: 44px; }
 .again { color: var(--amber); margin-top: 16px; }
 
 /* The record: the room's stenography, always in view at the foot of the screen. A neutral scrim keeps it readable over any scene. */

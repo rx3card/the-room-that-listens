@@ -17,6 +17,8 @@ export class AudioEngine {
   private wet!: GainNode
   private conv!: ConvolverNode
   private cups!: BiquadFilterNode
+  private meter?: AnalyserNode
+  private wave = new Float32Array(512)
   private layers: Layer[] = []
   private noiseBuf!: AudioBuffer
   private pinkBuf!: AudioBuffer
@@ -54,10 +56,22 @@ export class AudioEngine {
       }
       this.conv.connect(this.wet).connect(this.cups)
       this.cups.connect(limiter).connect(this.master).connect(ctx.destination)
+      this.meter = ctx.createAnalyser()
+      this.meter.fftSize = 512
+      this.master.connect(this.meter)
       this.setRoom('deaf')
     }
     this.master.gain.value = muted ? 0 : this.volume
     void this.ctx.resume()
+  }
+
+  /** What is audible right now, 0 to 1. It drives the signal line in the title. */
+  level() {
+    if (!this.meter) return 0
+    this.meter.getFloatTimeDomainData(this.wave)
+    let e = 0
+    for (const x of this.wave) e += x * x
+    return Math.min(1, Math.sqrt(e / this.wave.length) * 4)
   }
 
   setVolume(v: number) {
@@ -285,37 +299,42 @@ export class AudioEngine {
     this.layers = []
     this.sea = undefined
     const add = (l: Layer) => this.layers.push(l)
-    if (name === 'sea') {
+    if (name === 'title') {
+      add(this.loop('audio/music-title.mp3', 0.55, { fade: 0.8 }).layer)
+    } else if (name === 'sea') {
       this.setRoom('deaf')
       const s = this.loop('audio/sea.mp3', 0.8)
       this.sea = s.gain
       add(s.layer)
       add(this.surf(0.12).layer)
       add(this.wind(0.1))
+      add(this.loop('audio/music-call.mp3', 0.5, { fade: 1.5 }).layer)
     } else if (name === 'hall') {
       this.setRoom('deaf')
       add(this.drone([41, 61.7], 0.1))
       add(this.rainOn(0.006))
       add(this.loop('audio/rain.mp3', 0.5).layer)
+      add(this.loop('audio/music-hall.mp3', 0.42, { fade: 3 }).layer)
       this.tick('hum', 50)
     } else if (name === 'wax') {
       this.setRoom('wax')
       add(this.drone([55, 82.4, 110.5], 0.05, 'triangle', 240))
-      add(this.loop('audio/music-feeling-watched.mp3', 0.2, { fade: 6 }).layer)
+      add(this.loop('audio/music-feeling-watched.mp3', 0.45, { fade: 3 }).layer)
       // real voices from 1890 behind the shelves, too quiet to make out
       add(this.loop('audio/cylinder-1890.mp3', 0.16, { dest: this.panner('shelves', 6, 2, -7) }).layer)
     } else if (name === 'spiral') {
       this.setRoom('spiral')
       add(this.drone([36.7, 73.6, 146.8], 0.08, 'sine', 900))
       add(this.tonotopic())
-      add(this.loop('audio/music-sensory-deprivation.mp3', 0.22, { fade: 6 }).layer)
+      add(this.loop('audio/music-sensory-deprivation.mp3', 0.45, { fade: 3 }).layer)
     } else if (name === 'other') {
       this.setRoom('other')
       add(this.drone([32.7, 49], 0.12))
       add(this.loop('audio/wind-mars.mp3', 0.5, { rate: 0.7, fade: 4 }).layer)
-      add(this.loop('audio/music-perceptual-isolation.mp3', 0.26, { fade: 8 }).layer)
+      add(this.loop('audio/music-perceptual-isolation.mp3', 0.5, { fade: 3 }).layer)
     } else if (name === 'last') {
       add(this.drone([65.4], 0.035))
+      add(this.loop('audio/music-title.mp3', 0.3, { fade: 4 }).layer)
       // the oldest recorded voice there is, a recording never meant to be played
       add(this.loop('audio/phonautogram-1860.mp3', 0.12, { rate: 0.6, fade: 8 }).layer)
     }
