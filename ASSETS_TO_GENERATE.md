@@ -144,9 +144,15 @@ Close view from behind a steel desk standing in black water. On the desk a 1930s
 
 ## Segunda tanda
 
-Seis imágenes más, que cierran lo que la revisión independiente dejó abierto. Mismo procedimiento y mismo bloque común. Los alambres no se pintan: siguen vivos encima y reaccionan a la historia.
+Seis imágenes más, que cierran lo que la revisión independiente dejó abierto.
 
-Para las cinco de la espiral, usa `headland-seat` como referencia de estilo y añade esta frase al prompt: `Empty corridor: no wires, no rods, no hair, nothing standing in it.`
+Para cada una de las cinco de la espiral:
+
+1. Adjunta **dos imágenes**: su referencia de `docs/plate-refs/` y `public/assets/plates/headland-seat.webp`.
+2. Pega el **bloque común**.
+3. Pega debajo el prompt de esa imagen, tal cual.
+
+Los prompts ya piden el túnel vacío: los alambres no se pintan, porque siguen vivos encima de la imagen.
 
 ### `spiral-s1.webp`
 
@@ -154,7 +160,7 @@ Para las cinco de la espiral, usa `headland-seat` como referencia de estilo y a�
 - **Propósito:** la entrada a la espiral, aún cálida.
 
 ```text
-Inside a natural basalt spiral tunnel, two and a half metres wide, curving away to the left and downward. The rock has been lined with old board-marked concrete ribs every two metres, like the inside of a shell or a human cochlea. Wet walls, mineral stains. Faint warm light from behind the viewer dying within ten metres, then darkness around the bend. Palette: amber #FFAA55 fading to mineral grey #77747F and black.
+The second attached image is a style reference only: match its light, film look and material, not its composition. Inside a natural basalt spiral tunnel, two and a half metres wide, curving away to the left and downward. The rock has been lined with old board-marked concrete ribs every two metres, like the inside of a shell or a human cochlea. Wet walls, mineral stains. Faint warm light from behind the viewer dying within ten metres, then darkness around the bend. Palette: amber #FFAA55 fading to mineral grey #77747F and black. Empty corridor: no wires, no rods, no hair, nothing standing in it.
 ```
 
 ### `spiral-s2.webp`
@@ -162,7 +168,7 @@ Inside a natural basalt spiral tunnel, two and a half metres wide, curving away 
 - **Referencia:** `docs/plate-refs/spiral-s2.jpg`
 
 ```text
-The same basalt spiral tunnel further in, colder. The curve to the left is tighter and the concrete ribs are closer together. In the right wall a narrow vertical slit opens onto darkness. Cold, weak light from an unseen source at waist height. Palette: blue-black #0B0B10, mineral grey #77747F.
+The second attached image is a style reference only: match its light, film look and material, not its composition. The same basalt spiral tunnel further in, colder. The curve to the left is tighter and the concrete ribs are closer together. In the right wall a narrow vertical slit opens onto darkness. Cold, weak light from an unseen source at waist height. Palette: blue-black #0B0B10, mineral grey #77747F. Empty corridor: no wires, no rods, no hair, nothing standing in it.
 ```
 
 ### `spiral-s3.webp`
@@ -170,7 +176,7 @@ The same basalt spiral tunnel further in, colder. The curve to the left is tight
 - **Referencia:** `docs/plate-refs/spiral-s3.jpg`
 
 ```text
-Deep in the same basalt spiral tunnel, narrower, the roof low and the bend sharp to the left. Water runs in a thin film down the wall. The ribs look like bone. The far end of the bend is completely black. Very low cold light. Palette: near black #050507, mineral grey #77747F.
+The second attached image is a style reference only: match its light, film look and material, not its composition. Deep in the same basalt spiral tunnel, narrower, the roof low and the bend sharp to the left. Water runs in a thin film down the wall. The ribs look like bone. The far end of the bend is completely black. Very low cold light. Palette: near black #050507, mineral grey #77747F. Empty corridor: no wires, no rods, no hair, nothing standing in it.
 ```
 
 ### `spiral-s4.webp`
@@ -178,7 +184,7 @@ Deep in the same basalt spiral tunnel, narrower, the roof low and the bend sharp
 - **Referencia:** `docs/plate-refs/spiral-s4.jpg`
 
 ```text
-The narrowest part of the basalt spiral. The tunnel feels organic, closer to the inside of a body than a building. Ribs nearly touching, the floor curved like the walls. The tiniest thread of warm orange light comes from around the next bend. Palette: near black #050507, a trace of ember #FF6A00.
+The second attached image is a style reference only: match its light, film look and material, not its composition. The narrowest part of the basalt spiral. The tunnel feels organic, closer to the inside of a body than a building. Ribs nearly touching, the floor curved like the walls. The tiniest thread of warm orange light comes from around the next bend. Palette: near black #050507, a trace of ember #FF6A00. Empty corridor: no wires, no rods, no hair, nothing standing in it.
 ```
 
 ### `spiral-s5.webp`
@@ -187,7 +193,7 @@ The narrowest part of the basalt spiral. The tunnel feels organic, closer to the
 - **Propósito:** el final de la espiral. Tiene que ser un objeto, no un brillo.
 
 ```text
-The end of the basalt spiral: the tunnel tapers to a real circular opening in the rock, about one metre across, with a worn rim like the mouth of a well. Warm orange light rises from deep beyond it, lighting the wet edge from inside and raking across the last ribs. The viewer feels the air pulling in. Palette: black, ember #FF6A00, amber #FFAA55.
+The second attached image is a style reference only: match its light, film look and material, not its composition. The end of the basalt spiral: the tunnel tapers to a real circular opening in the rock, about one metre across, with a worn rim like the mouth of a well. Warm orange light rises from deep beyond it, lighting the wet edge from inside and raking across the last ribs. The viewer feels the air pulling in. Palette: black, ember #FF6A00, amber #FFAA55. Empty corridor: no wires, no rods, no hair, nothing standing in it.
 ```
 
 ### `other-shore.webp` (sustituye a la actual)
