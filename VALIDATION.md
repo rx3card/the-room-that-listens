@@ -25,9 +25,11 @@ La prueba del final por inacción salta directamente al escritorio del capítulo
 | Taste `lint.mjs` | 0 FAIL. Excepciones marcadas: sombra de texto y degradado neutro sobre imagen en vivo, por legibilidad |
 | Taste `inspect.mjs` | 3 FAIL de reglas pensadas para páginas con scroll (pocas fotos, página quieta, título tardío). Este último destapó un error real de `pointer-events`, ya corregido. No se volvió a ejecutar tras corregirlo |
 | Impeccable `detect` | Sin hallazgos |
-| Impeccable, revisión final independiente | **rebuild**: el título, el registro y las composiciones se sostienen; los materiales de cerca no, hasta que existan los planos |
+| Impeccable, revisión final independiente | Segunda revisión, ya con las 11 vistas pintadas: **rebuild solo para la espiral**. Las salas con imagen pasan como materia creíble |
 
-La revisión también encontró defectos que se corrigieron después: alambres sin antialiasing, papeles sin texto, ámbar que viraba a limón, moteado en reposo, resolución baja en teléfono, contraste del registro y etiquetas cortadas. No se pidió una segunda revisión, porque el veredicto depende de las imágenes pendientes.
+La primera revisión encontró defectos que se corrigieron: papeles sin texto, ámbar que viraba a limón, moteado en reposo, resolución baja en teléfono, contraste del registro y etiquetas cortadas. La segunda añadió lista de cilindros incompleta en teléfono, grano en reposo, marcas sobre nada y borde del velo inferior, también corregidos. No se ha repetido la revisión tras esas correcciones.
+
+Quedan abiertos: las cinco vistas de la espiral y la continuidad de `other-shore`, listas en ASSETS_TO_GENERATE.md; las sillas caídas siguen siendo 3D sobre la pintura; y el asiento recuerda a una alcantarilla, cerca del pasillo oscuro que la tesis rechaza.
 
 ## Revisado por una persona o por capturas
 
@@ -40,7 +42,6 @@ Se miraron capturas de 14 momentos en 1440 × 900 y 390 × 844. Rendimiento en P
 - **Micrófono real:** solo con dispositivo simulado.
 - **Móvil físico y Safari:** no probados. El panel integrado bloquea el micrófono y las capturas son emuladas.
 - **Lectores de pantalla:** no probados.
-- **Planos:** el sistema compila, pero ninguna imagen real ha pasado por él todavía.
 - **Memoria en sesiones largas:** no medida.
 - **Procedencia embebida en imágenes:** `impeccable embed-prompt --scan` marca tres imágenes sin metadatos. Su origen sí consta en ASSET_SOURCES.md.
 
@@ -54,5 +55,5 @@ Se miraron capturas de 14 momentos en 1440 × 900 y 390 × 844. Rendimiento en P
 | ¿Las decisiones importan? | Sí: cambian sillas, registro, finales y la siguiente visita |
 | ¿Se entiende cómo avanzar? | Sí en las capturas; falta probarlo con alguien real |
 | ¿Funciona en móvil? | En emulación |
-| ¿Los escenarios están bien compuestos? | En plano general sí. De cerca aún delatan el 3D |
-| ¿Terminado? | La experiencia funciona de principio a fin. La calidad visual final depende de las 11 imágenes |
+| ¿Los escenarios están bien compuestos? | Sí en las once vistas pintadas. La espiral y los movimientos de cámara aún delatan el 3D |
+| ¿Terminado? | La experiencia funciona de principio a fin. Falta la espiral pintada para cerrar la revisión visual |

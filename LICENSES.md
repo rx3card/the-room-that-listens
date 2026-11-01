@@ -26,6 +26,6 @@ Media are **not** covered by the MIT licence.
 | SINIUS tracks | CC BY 4.0 | Attribution |
 | `sea.mp3`, `steps-spiral.mp3`, `denge.jpg` | CC BY-SA 4.0 | Attribution; altered versions stay under CC BY-SA |
 
-Any plate generated for `public/assets/plates/` is subject to the terms of the tool that made it.
+The plates in `public/assets/plates/` were generated with ChatGPT and are subject to OpenAI's terms. They are not MIT.
 
 The project is personal for now. If it is ever published, re-check this table first. Audio files are only re-encoded, and the Archives page carries the attributions.

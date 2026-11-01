@@ -34,6 +34,10 @@ Host Grotesk by Element Type. Courier Prime by Alan Dague-Greene. SIL OFL 1.1.
 
 Alvin Lucier, *I Am Sitting in a Room*, 1969. Homer Dudley, the Voder, 1939. Historic England on the Denge sound mirrors.
 
+## Painted views
+
+Generated with ChatGPT from references of this project's own scenes, directed by the project's owner.
+
 ## Made here
 
 Story, code, 3D geometry, the formant voices and all synthesised sound. The names, the people and the station are invented.

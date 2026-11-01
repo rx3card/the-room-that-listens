@@ -34,6 +34,10 @@ SINIUS, *The Silence Before the Haunting*, CC BY 4.0, [Free Music Archive](https
 | Fig. 928 | Henry Gray, 1918 | Dominio público | [Commons](https://commons.wikimedia.org/wiki/File:Gray928.png) | `gray-cochlea.png` (descargada, sin usar en escena) |
 | Acoustic Mirrors | Teseum | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:Acoustic_Mirrors.jpg) | `denge.jpg`, reducida a 1400 px |
 
+## Vistas pintadas
+
+Once imágenes generadas con ChatGPT por el dueño del proyecto a partir de `docs/plate-refs/`, con los prompts de ASSETS_TO_GENERATE.md. Convertidas a WebP calidad 86, sin retoque. Ruta: `public/assets/plates/`.
+
 ## Texturas y modelos
 
 Todo de [Poly Haven](https://polyhaven.com), CC0. Texturas a 1K en WebP. Modelos con Meshopt y texturas a 512 px.

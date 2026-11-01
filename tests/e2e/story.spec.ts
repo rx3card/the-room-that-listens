@@ -50,6 +50,7 @@ test('the story reaches the hall and offers marks', async ({ page }) => {
   await enter(page)
   await expect(page.locator('.spot')).toHaveCount(4)
   await expect(page.locator('.record')).toContainText('Nobody has been paid')
+  await page.waitForFunction(() => !!room.stage.plate, null, { timeout: 15_000 }) // the painted plate really arrives
   expect(errors).toEqual([])
 })
 

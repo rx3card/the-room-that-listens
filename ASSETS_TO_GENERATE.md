@@ -1,6 +1,8 @@
 # Imágenes para generar con ChatGPT
 
-Estas once imágenes son el salto de calidad más grande que le queda al proyecto. Cada una se proyecta sobre un encuadre fijo, como un matte painting de cine. La luz que parpadea, el polvo, la lluvia y las marcas interactivas siguen vivos encima.
+**Estado: las once están generadas e integradas en `public/assets/plates/`.** Los originales están en `assets-src/plates/`. Este documento queda para regenerar alguna.
+
+Cada una se proyecta sobre un encuadre fijo, como un matte painting de cine. La luz que parpadea, el polvo, la lluvia y las marcas interactivas siguen vivos encima.
 
 **No hay que tocar código.** Si un archivo no existe, la escena usa el 3D en tiempo real.
 
@@ -139,6 +141,61 @@ Standing among rows of old wooden chairs in still black water before dawn. Worn 
 ```text
 Close view from behind a steel desk standing in black water. On the desk a 1930s stenographic typewriter with a sheet of paper in the roller, the writing unreadable grey lines, never real letters. A small lamp on a thin stand. An old radio set at the left. The paper glows. Beyond the desk, darkness and water with one thin line of red dawn.
 ```
+
+## Segunda tanda
+
+Seis imágenes más, que cierran lo que la revisión independiente dejó abierto. Mismo procedimiento y mismo bloque común. Los alambres no se pintan: siguen vivos encima y reaccionan a la historia.
+
+Para las cinco de la espiral, usa `headland-seat` como referencia de estilo y añade esta frase al prompt: `Empty corridor: no wires, no rods, no hair, nothing standing in it.`
+
+### `spiral-s1.webp`
+
+- **Referencia:** `docs/plate-refs/spiral-s1.jpg`
+- **Propósito:** la entrada a la espiral, aún cálida.
+
+```text
+Inside a natural basalt spiral tunnel, two and a half metres wide, curving away to the left and downward. The rock has been lined with old board-marked concrete ribs every two metres, like the inside of a shell or a human cochlea. Wet walls, mineral stains. Faint warm light from behind the viewer dying within ten metres, then darkness around the bend. Palette: amber #FFAA55 fading to mineral grey #77747F and black.
+```
+
+### `spiral-s2.webp`
+
+- **Referencia:** `docs/plate-refs/spiral-s2.jpg`
+
+```text
+The same basalt spiral tunnel further in, colder. The curve to the left is tighter and the concrete ribs are closer together. In the right wall a narrow vertical slit opens onto darkness. Cold, weak light from an unseen source at waist height. Palette: blue-black #0B0B10, mineral grey #77747F.
+```
+
+### `spiral-s3.webp`
+
+- **Referencia:** `docs/plate-refs/spiral-s3.jpg`
+
+```text
+Deep in the same basalt spiral tunnel, narrower, the roof low and the bend sharp to the left. Water runs in a thin film down the wall. The ribs look like bone. The far end of the bend is completely black. Very low cold light. Palette: near black #050507, mineral grey #77747F.
+```
+
+### `spiral-s4.webp`
+
+- **Referencia:** `docs/plate-refs/spiral-s4.jpg`
+
+```text
+The narrowest part of the basalt spiral. The tunnel feels organic, closer to the inside of a body than a building. Ribs nearly touching, the floor curved like the walls. The tiniest thread of warm orange light comes from around the next bend. Palette: near black #050507, a trace of ember #FF6A00.
+```
+
+### `spiral-s5.webp`
+
+- **Referencia:** `docs/plate-refs/spiral-s5.jpg`
+- **Propósito:** el final de la espiral. Tiene que ser un objeto, no un brillo.
+
+```text
+The end of the basalt spiral: the tunnel tapers to a real circular opening in the rock, about one metre across, with a worn rim like the mouth of a well. Warm orange light rises from deep beyond it, lighting the wet edge from inside and raking across the last ribs. The viewer feels the air pulling in. Palette: black, ember #FF6A00, amber #FFAA55.
+```
+
+### `other-shore.webp` (sustituye a la actual)
+
+- **Referencia:** `docs/plate-refs/other-shore.jpg`
+- **Por qué:** en la orilla se ve un farol y un escritorio vacío, y en las dos siguientes vistas hay lámpara de cuello y máquina de escribir. Adjunta también `public/assets/plates/other-rows.webp` como referencia de continuidad.
+
+Usa el prompt de `other-shore` de arriba y añade: `The small desk carries a typewriter and a gooseneck lamp, exactly as in the second attached image. The headland silhouette matches that image too.`
 
 ## Opcionales
 

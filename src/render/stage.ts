@@ -28,7 +28,7 @@ class Grade extends Effect {
         float L0=max(dot(c,vec3(.2126,.7152,.0722)),1e-4);
         c=mix(aces(c),clamp(c*(aces(vec3(L0)).r/L0),0.,1.),.65);
         float g=r(gl_FragCoord.xy*.731+fract(uTime*7.13)*97.)-.5;
-        c+=g*(.012+uGrain*.07)*(1.-dot(c,vec3(.33))*.6);
+        c+=g*(.003+uGrain*.07)*(1.-dot(c,vec3(.33))*.6);
         outputColor=vec4(c,1.);
       }`,
       {
@@ -74,6 +74,7 @@ export class Stage {
   private ao?: N8AOPostPass
   private plates = new Map<string, THREE.Texture | null>()
   private plate?: THREE.Mesh
+  private plateRange: [number, number] = [0.05, 0.04]
   private stageId = ''
   private bloom?: BloomEffect
   private t = 0
@@ -143,6 +144,7 @@ export class Stage {
     this.composer.setSize(w, h, false)
     this.camera.aspect = w / h
     this.camera.updateProjectionMatrix()
+    if (this.plate && this.node) this.fitPlate(this.node, 0)
   }
 
   private bindLook() {
@@ -167,7 +169,7 @@ export class Stage {
         this.yawT += (-(e.clientX / innerWidth - 0.5) * 0.2 - this.yawT) * 0.04
         this.pitchT += (-(e.clientY / innerHeight - 0.5) * 0.12 - this.pitchT) * 0.04
       }
-      const range = this.plate ? [0.14, 0.08] : (this.node?.range ?? [0.7, 0.4]) // a plate has a finite edge
+      const range = this.plate ? this.plateRange : (this.node?.range ?? [0.7, 0.4]) // a plate has a finite edge
       this.yawT = clamp(this.yawT, -range[0], range[0])
       this.pitchT = clamp(this.pitchT, -range[1], range[1])
     })
@@ -231,7 +233,27 @@ export class Stage {
     b.scene.add(mesh)
     this.plate = mesh
     if (this.ao) this.ao.enabled = false // a painting carries its own contact shadows
+    this.fitPlate(n, 1.2)
     void this.tweens.to(1.2, k => ((mesh.material as THREE.MeshBasicMaterial).opacity = k))
+  }
+
+  /** Widens the lens to show as much of the painting as this screen allows. Marks stay registered: it is the same perspective. */
+  private fitPlate(n: CamNode, dur: number) {
+    const tanV = Math.tan(THREE.MathUtils.degToRad(((n.fov ?? 50) * PLATE_FOV) / 2))
+    const tanH = tanV * PLATE_ASPECT
+    const tan = Math.min(tanV * 0.97, (tanH * 0.97) / this.camera.aspect)
+    const to = 2 * THREE.MathUtils.radToDeg(Math.atan(tan))
+    this.plateRange = [Math.max(0.01, Math.atan(tanH) - Math.atan(tan * this.camera.aspect) - 0.01), Math.max(0.01, Math.atan(tanV) - Math.atan(tan) - 0.01)]
+    const from = this.camera.fov
+    void this.tweens.to(dur, k => {
+      this.camera.fov = from + (to - from) * smooth(k)
+      this.camera.updateProjectionMatrix()
+    })
+  }
+
+  /** Pressing into a painting: it cannot bulge, so the camera seems to sink into it. */
+  press(k: number) {
+    this.plate?.scale.setScalar(1 + k * 0.3)
   }
 
   private hidePlate(dur: number) {
@@ -332,8 +354,8 @@ export class Stage {
     const b = this.built
     if (b) {
       b.update(this.t, dt, this.live)
-      // cancel this view's exposure so the painting arrives as painted; 0.72 sits it under the tone curve
-      if (this.plate) (this.plate.material as THREE.MeshBasicMaterial).color.setScalar(((b.light?.() ?? 1) * 0.72) / (b.exposure * this.nodeExposure))
+      // cancel this view's exposure so the painting arrives as painted; 1.25 offsets the tone curve and vignette
+      if (this.plate) (this.plate.material as THREE.MeshBasicMaterial).color.setScalar(((b.light?.() ?? 1) * (1 - this.live.lean * 0.5) * 1.25) / (b.exposure * this.nodeExposure))
       this.nodeExposure += ((this.node?.exposure ?? 1) - this.nodeExposure) * Math.min(1, dt * 1.5)
       this.grade.set('uExposure', b.exposure * this.nodeExposure * this.fade)
       this.grade.set('uGrain', this.grain + this.live.lean * 0.5)

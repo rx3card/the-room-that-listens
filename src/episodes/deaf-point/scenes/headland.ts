@@ -222,12 +222,14 @@ export async function buildHeadland(q: Quality): Promise<Built> {
   scene.add(cone)
 
   // Iron shutter over the hole at the centre of the bowl.
-  const shutterMat = pbr('rust', [1, 1], { color: '#4b3d36', metalness: 0.6, roughness: 0.8 })
+  const shutterMat = pbr('rust', [1, 1], { color: '#1a1512', metalness: 0.5, roughness: 0.85 })
   const shutterL = new THREE.Mesh(new THREE.CircleGeometry(1.9, 32, Math.PI / 2, Math.PI), shutterMat)
   const shutterR = new THREE.Mesh(new THREE.CircleGeometry(1.9, 32, -Math.PI / 2, Math.PI), shutterMat)
+  shutterMat.transparent = true // lets the shutter stay live above the painted plate and open on cue
   for (const s of [shutterL, shutterR]) {
     s.position.set(0, CX, 0.25)
     s.rotation.y = Math.PI
+    s.renderOrder = 2
     scene.add(s)
   }
   const holeBack = new THREE.Mesh(new THREE.CircleGeometry(2.6, 32), new THREE.MeshBasicMaterial({ color: '#000' }))
@@ -256,8 +258,11 @@ export async function buildHeadland(q: Quality): Promise<Built> {
       }),
     }),
   )
-  plate.position.set(0.0, GROUND + 1.6, FOCUS.z - 0.66)
+  plate.position.set(0.0, GROUND + 1.6, FOCUS.z - 0.95)
   plate.rotation.y = Math.PI
+  // the painting has no builder's plate: this real one is fixed above it, so its mark points at something
+  ;(plate.material as THREE.MeshStandardMaterial).transparent = true
+  plate.renderOrder = 2
   scene.add(plate)
 
   const box = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.65, 0.2), rust)
@@ -329,7 +334,7 @@ export async function buildHeadland(q: Quality): Promise<Built> {
     anchors: {
       plate: plate.position.clone(),
       box: box.position.clone(),
-      plan: planTube.position.clone(),
+      plan: box.position.clone().add(v3(1.1, -0.9, -0.5)), // the plan lies by the weather box in the painted view
       pier: v3(0, GROUND + 5.5, FOCUS.z - 0.7),
       hole: v3(0, CX + 0.2, 0.4),
       down: v3(0.8, CX - 0.5, FOCUS.z - 1.2),

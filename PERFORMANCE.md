@@ -17,13 +17,13 @@ Radeon 610M integrada, Brave headless con ANGLE sobre radeonsi, 1440 × 900, cal
 
 | Escena | FPS |
 | --- | --- |
-| Patio | 60 |
-| Asiento | 24 |
-| Sala de cera, estante, escritorio, membrana | 59 a 60 |
+| Patio (tras el vuelo; sin plato medido 60) | 23 a 60 |
+| Asiento | 46 |
+| Sala de cera, estante, escritorio, membrana | 54 a 60 |
 | Espiral, los cuatro nodos | 60 |
-| Orilla, filas, escritorio final | 46 a 51 |
+| Orilla, filas, escritorio final | 49 a 60 |
 
-El asiento es el punto flojo: el cuenco llena la pantalla. La calidad automática lo compensa bajando resolución por debajo de 32 fps.
+El patio es el punto a vigilar: su lectura de 23 fps llega justo tras el vuelo y no se ha aislado. La calidad automática baja resolución por debajo de 32 fps.
 
 No se ha medido en un móvil físico. Las capturas de teléfono son emuladas sobre SwiftShader.
 
@@ -34,7 +34,7 @@ No se ha medido en un móvil físico. Las capturas de teléfono son emuladas sob
 | Resolución máxima | 2× | 1,25× | 1,5× |
 | Sombras | 2048 | 1024 | No |
 | Bloom y AO | Sí | Sí | No |
-| MSAA | 4× | No | No |
+| MSAA | 4× | 2× | No |
 | Alambres de la espiral | 22 000 | 11 000 | 4 200 |
 | Cilindros | 16 000 | 16 000 | 7 500 |
 
@@ -51,4 +51,5 @@ LITE conserva toda la narrativa e interacciones. Prefiere más resolución y men
 ## Pendiente
 
 - KTX2 no se usó porque `toktx` no está instalado. Las texturas son WebP, que ocupan más memoria de GPU.
-- Generar los planos añadirá unos 300 KB por imagen.
+- Las once vistas pintadas pesan 1,3 MB en total. Con el 3D debajo aún activo no ahorran GPU; ocultarlo sería una mejora posible.
+- Las vistas son de 1536 × 1024: en pantallas 4K se notará que están ampliadas.

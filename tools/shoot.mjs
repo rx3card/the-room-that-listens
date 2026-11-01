@@ -44,6 +44,11 @@ const go = async id => {
       await page.locator('.hold').waitFor({ state: 'detached', timeout: 60000 })
       await page.keyboard.up('Space')
     }
+    if (await page.locator('.crank .wheel').isVisible().catch(() => false)) {
+      await page.keyboard.down('Space')
+      await page.locator('.crank .wheel').waitFor({ state: 'detached', timeout: 60000 })
+      await page.keyboard.up('Space')
+    }
     await page.waitForTimeout(120)
   }
   await page.waitForTimeout(300)
@@ -65,13 +70,17 @@ await idle()
 await shot('wax')
 await go('shelf')
 await shot('shelf')
+await go('cyl.prado') // naming people is what knocks chairs over in chapter four
+await go('cyl.alma')
+await go('cyl.aguirre')
 await go('backShelf')
 await go('desk')
 await shot('desk')
-await go('notebook').catch(() => {})
-await page.locator('.sheet .btn').first().click({ timeout: 5000 }).catch(() => {})
 await go('backDesk')
 await page.evaluate(() => (room.dir.state.flags.relay = true))
+await page.evaluate(() => room.stage.moveTo('relay', 0.05))
+await shot('relay')
+await page.evaluate(() => room.stage.moveTo('floor', 0.05))
 await go('skin')
 await shot('skin')
 await go('push')

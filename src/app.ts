@@ -214,7 +214,7 @@ export class App implements Host {
       const p = a[id] ? s.project(a[id]) : null
       node.style.display = p ? '' : 'none'
       if (!p) continue
-      const bar = innerWidth > innerHeight ? clamp((innerHeight - innerWidth / 2.39) / 2, 0, innerHeight * 0.15) : 0
+      const bar = innerWidth > innerHeight ? clamp((innerHeight - innerWidth / 2.39) / 2, 0, innerHeight * 0.11) : 0
       // on a portrait phone the record sits on the image, so marks stay above it
       const foot = innerWidth > innerHeight ? bar + 28 : innerHeight * 0.3
       const x = clamp(p.x, 40, innerWidth - 40), y = clamp(p.y, bar + 56, innerHeight - foot)
@@ -426,6 +426,7 @@ export class App implements Host {
           progress = clamp(progress + (pushing ? dt / seconds : -dt / 3))
           ctl.progress(progress)
           stage?.built?.event('push', progress)
+          stage?.press(progress)
           if (stage) stage.leak = progress * 0.8
           if (pushing && Math.random() < dt * 2) this.audio.tick('skin')
           if (progress >= 1) finish(true)
@@ -455,8 +456,10 @@ export class App implements Host {
     const nextStage = deafPoint.scenes[to].stage
     this.voiceEl.textContent = ''
     if (!s) return void (await this.wait(1))
-    if (via === 'landing') await this.flight
-    else if (via === 'descent') {
+    if (via === 'landing') {
+      await this.flight
+      await s.moveTo('forecourt', 2 * FAST) // settles framing and field of view so the plate lands exactly
+    } else if (via === 'descent') {
       await s.fly(descentPath(), new THREE.Vector3(0, FOCUS.y + 0.2, 12), 5.5 * FAST, inOut)
       await s.fadeTo(0, 0.6 * FAST)
       await this.planView(['mirror', 'gallery', 'relay'], 'ch.recording')
@@ -481,6 +484,7 @@ export class App implements Host {
       const shore = s.built!.nodes.shore
       void s.fadeTo(1, 3 * FAST)
       await s.fly([s.built!.nodes.high.pos, new THREE.Vector3(0, 14, 44), shore.pos], shore.look, 6.5 * FAST, k => 1 - (1 - k) ** 3)
+      await s.moveTo('shore', 1.5 * FAST)
     } else if (via === 'horizon') {
       await s.fadeTo(0, 3 * FAST)
       this.canvas.classList.remove('on')

@@ -7,6 +7,8 @@ interface Part {
   material: THREE.Material
 }
 
+const FALLEN_SPOTS: [number, number, number][] = [[-3.4, 14.2, 0.7], [3.2, 15, -1.1], [-1.4, 16.4, 2.2], [4.6, 17, 0.3], [-5, 15, -2]]
+
 const smoothEdge = (x: number) => { const t = Math.min(1, Math.max(0, x)); return t * t * t }
 
 const seat = (i: number) => {
@@ -58,6 +60,29 @@ export async function buildOther(q: Quality, fallen: number[], lines: string[]):
     up.castShadow = true
     ;(p.material as THREE.Material).side = THREE.DoubleSide
     scene.add(up, down)
+    // The painted chairs all stand. The ones the visitor named are real geometry above the plate, with their reflections.
+    if (fallen.length) {
+      const liveUp = new THREE.InstancedMesh(p.geometry, (p.material as THREE.MeshStandardMaterial).clone(), fallen.length)
+      const liveDown = new THREE.InstancedMesh(p.geometry, dim.clone(), fallen.length)
+      fallen.forEach((_, k) => {
+        // placed where the eye rests in both painted views, not at the register's seat
+        const [x, z, ry] = FALLEN_SPOTS[k % FALLEN_SPOTS.length]
+        m4.compose(v3(x, 0.14, z), q4.setFromEuler(e.set(-Math.PI / 2 + 0.05, ry, 0.2)), s1)
+        liveUp.setMatrixAt(k, m4)
+        liveDown.setMatrixAt(k, new THREE.Matrix4().multiplyMatrices(mirror, m4))
+      })
+      for (const live of [liveUp, liveDown]) {
+        const mat = live.material as THREE.MeshStandardMaterial
+        mat.transparent = true
+        // their own wood, dimly self-lit: a painted scene is brighter than its blockout and they would vanish in it
+        mat.color.set('#2a1a14')
+        mat.emissive.set('#7a3c22')
+        mat.emissiveMap = mat.map
+        mat.emissiveIntensity = live === liveUp ? 0.22 : 0.05
+        live.renderOrder = 2
+      }
+      scene.add(liveUp, liveDown)
+    }
   }
 
   // The water is the mirror of an upside-down world beneath a thin dark sheet. It keeps everything except the visitor.
@@ -125,7 +150,6 @@ export async function buildOther(q: Quality, fallen: number[], lines: string[]):
     new THREE.PlaneGeometry(0.3, 0.36),
     new THREE.MeshStandardMaterial({
       roughness: 0.9,
-      transparent: true,
       // the page in the machine is what the visitor has actually done tonight
       map: canvasTexture(900, 1080, c => {
         c.fillStyle = '#d7cdb8'
@@ -150,7 +174,6 @@ export async function buildOther(q: Quality, fallen: number[], lines: string[]):
   )
   sheet.position.set(0, 0.34, 0.14)
   sheet.rotation.x = -0.28
-  sheet.renderOrder = 2
   steno.add(body, platen, sheet)
   steno.position.set(0.1, 0.77, 13.05)
   scene.add(deskS, steno)

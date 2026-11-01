@@ -188,7 +188,7 @@ export async function buildWax(q: Quality): Promise<Built> {
   chairS.position.set(0.7, 0, 6.9)
   chairS.rotation.y = 2.5
   scene.add(deskGroup, chairS)
-  // Real writing, in the visitor's language. Papers draw above any plate, so a painted desk can stay blank.
+  // Real writing, in the visitor's language, for anyone running without the painted plate.
   const paper = (w: number, h: number, title: string, body: string, face: string) => {
     const cv = canvasTexture(1024, Math.round((1024 * h) / w), c => {
       c.fillStyle = '#b9ad93'
@@ -211,18 +211,16 @@ export async function buildWax(q: Quality): Promise<Built> {
         y += 46
       }
     })
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h).rotateX(-Math.PI / 2).rotateY(Math.PI), new THREE.MeshStandardMaterial({ map: cv, roughness: 0.85, transparent: true }))
-    m.renderOrder = 2
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h).rotateX(-Math.PI / 2).rotateY(Math.PI), new THREE.MeshStandardMaterial({ map: cv, roughness: 0.85 }))
     return m
   }
   const ledger = paper(0.46, 0.33, t('doc.ledger.t'), t('doc.ledger.b'), '"Courier Prime", monospace')
   const notebook = paper(0.26, 0.2, t('doc.notebook.t'), t('doc.notebook.b'), '"Host Grotesk Variable", sans-serif')
-  const cut = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.3).rotateX(-Math.PI / 2).rotateY(Math.PI), new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load(`${import.meta.env.BASE_URL}assets/img/gray-ear.png`, x => void (x.colorSpace = THREE.SRGBColorSpace)), roughness: 0.85, transparent: true }))
-  cut.renderOrder = 2
-  ledger.position.set(-0.35, 0.79, 7.9)
-  notebook.position.set(0.2, 0.79, 7.72)
+  const cut = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.3).rotateX(-Math.PI / 2).rotateY(Math.PI), new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load(`${import.meta.env.BASE_URL}assets/img/gray-ear.png`, x => void (x.colorSpace = THREE.SRGBColorSpace)), roughness: 0.85 }))
+  ledger.position.set(0.02, 0.79, 7.92)
+  notebook.position.set(0.52, 0.79, 8.2)
   notebook.rotation.y = 0.2
-  cut.position.set(0.58, 0.79, 7.96)
+  cut.position.set(-0.58, 0.79, 7.72)
   cut.rotation.y = -0.15
   scene.add(ledger, notebook, cut)
   const bay = new THREE.PointLight('#ff9a4c', 1.1, 5, 1.8)

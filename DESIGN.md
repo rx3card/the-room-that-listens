@@ -147,7 +147,7 @@ components:
 
 ## Overview
 
-**Estado.** Este documento registra lo construido, no un acabado aprobado. La disposición de la revisión final sigue siendo **rebuild**, pendiente de las once imágenes de ChatGPT descritas en `ASSETS_TO_GENERATE.md`. Hoy existen 0 de 11: `public/assets/plates/` no existe y toda escena cae al 3D en tiempo real. Por eso las reglas de interfaz, tipo, color y luz son firmes, mientras que el acabado de imagen de las escenas es provisional. Revisa este documento cuando las placas entren.
+Estado: las once vistas pintadas están integradas. La revisión final mantiene rebuild solo para la espiral.
 
 **Creative North Star: "El oído en sección"**
 

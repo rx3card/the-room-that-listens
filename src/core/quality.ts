@@ -14,7 +14,7 @@ export interface Quality {
 
 const TIERS: Record<QualityName, Omit<Quality, 'name'>> = {
   cinematic: { dpr: 2, shadows: 2048, bloom: true, msaa: 4, dust: 900, rain: 1600, wires: 22000, seaDetail: 3 },
-  balanced: { dpr: 1.25, shadows: 1024, bloom: true, msaa: 0, dust: 450, rain: 700, wires: 11000, seaDetail: 2 },
+  balanced: { dpr: 1.25, shadows: 1024, bloom: true, msaa: 2, dust: 450, rain: 700, wires: 11000, seaDetail: 2 },
   lite: { dpr: 1.5, shadows: 0, bloom: false, msaa: 0, dust: 160, rain: 220, wires: 4200, seaDetail: 1 },
 }
 

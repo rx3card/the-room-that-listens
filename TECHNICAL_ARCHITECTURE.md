@@ -34,7 +34,7 @@ The rule: **an episode is data**. A scene lists hotspots and steps. `Director` w
 
 ## Matte plates
 
-If `public/assets/plates/<stage>-<node>.webp` exists, `Stage.showPlate` hangs it in the world in front of that node at `renderOrder 1` with no depth test. Objects at `renderOrder 2` (dust, rain, beams, wires) stay live on top. `Built.light()` drives its brightness, so a painted lamp flickers with the real one. Moving away cross-fades back to 3D.
+If `public/assets/plates/<stage>-<node>.webp` exists, `Stage.showPlate` hangs it in the world in front of that node at `renderOrder 1` with no depth test. Objects at `renderOrder 2` (dust, rain, beams, wires) stay live on top. `Built.light()` drives its brightness, so a painted lamp flickers with the real one. Leaving a plate dissolves through dark, and `fitPlate` widens the lens to show as much of the painting as the screen allows; marks stay registered because the perspective is the same. Story beats a painting cannot show stay live above it at `renderOrder 2`: the shutter in the bowl and the chairs the visitor named.
 
 `tools/plates.mjs` shoots the references at 1.45 × the node's field of view in 3:2. Those constants must match `PLATE_FOV` and `PLATE_ASPECT`.
 
