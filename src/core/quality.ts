@@ -13,9 +13,9 @@ export interface Quality {
 }
 
 const TIERS: Record<QualityName, Omit<Quality, 'name'>> = {
-  cinematic: { dpr: 2, shadows: 2048, bloom: true, msaa: 4, dust: 900, rain: 1600, wires: 9000, seaDetail: 3 },
-  balanced: { dpr: 1.25, shadows: 1024, bloom: true, msaa: 2, dust: 450, rain: 700, wires: 5000, seaDetail: 2 },
-  lite: { dpr: 1.5, shadows: 0, bloom: false, msaa: 0, dust: 160, rain: 220, wires: 2400, seaDetail: 1 },
+  cinematic: { dpr: 2, shadows: 2048, bloom: true, msaa: 4, dust: 900, rain: 1600, wires: 3200, seaDetail: 3 },
+  balanced: { dpr: 1.25, shadows: 1024, bloom: true, msaa: 2, dust: 450, rain: 700, wires: 2000, seaDetail: 2 },
+  lite: { dpr: 1.5, shadows: 0, bloom: false, msaa: 0, dust: 160, rain: 220, wires: 1000, seaDetail: 1 },
 }
 
 export const quality = (name: QualityName): Quality => ({ name, ...TIERS[name] })

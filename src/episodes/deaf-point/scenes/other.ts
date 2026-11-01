@@ -7,7 +7,7 @@ interface Part {
   material: THREE.Material
 }
 
-const FALLEN_SPOTS: [number, number, number][] = [[-3.4, 14.2, 0.7], [3.2, 15, -1.1], [-1.4, 16.4, 2.2], [4.6, 17, 0.3], [-5, 15, -2]]
+const FALLEN_SPOTS: [number, number, number][] = [[-1.4, 16.4, 2.2], [1.9, 17.4, -1.1], [-0.2, 18.8, 0.7], [2.9, 15.6, 0.3], [-2.7, 15.8, -2]]
 
 const smoothEdge = (x: number) => { const t = Math.min(1, Math.max(0, x)); return t * t * t }
 
@@ -75,12 +75,14 @@ export async function buildOther(q: Quality, fallen: number[], lines: string[]):
         const mat = live.material as THREE.MeshStandardMaterial
         mat.transparent = true
         // their own wood, dimly self-lit: a painted scene is brighter than its blockout and they would vanish in it
-        mat.color.set('#2a1a14')
+        mat.color.set('#3a2a20')
         mat.emissive.set('#7a3c22')
         mat.emissiveMap = mat.map
-        mat.emissiveIntensity = live === liveUp ? 0.22 : 0.05
-        live.renderOrder = 2
+        mat.emissiveIntensity = live === liveUp ? 0.18 : 0.04
+        live.renderOrder = live === liveUp ? 2.1 : 2
       }
+      // the hidden blockout must not cut these into shards: they only depth-test against each other
+      liveDown.onBeforeRender = renderer => renderer.clearDepth()
       scene.add(liveUp, liveDown)
     }
   }

@@ -300,7 +300,7 @@ export async function buildWax(q: Quality): Promise<Built> {
       backRelay: v3(-5.4, 1.2, 1.6),
       backSkin: v3(3.6, 1.2, 1.7),
       ledger: ledger.position.clone(),
-      notebook: notebook.position.clone(),
+      notebook: v3(3.97, -2.83, 14.52), // ray through the painted notebook, seen from the desk node
       gray: cut.position.clone(),
       dials: v3(-R + 0.4, 1.7, 0),
       readSkin: v3(7.6, 3.9, -2.4),

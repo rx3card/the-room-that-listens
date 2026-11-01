@@ -68,7 +68,7 @@ export const en = {
   'desc.call': 'Open water at night. A headland ahead. On it, a concrete dish thirty metres across, facing the sea, with a dark hole at its centre.',
   'desc.hall': 'The concrete bowl rises on three sides like the inside of a shell. A pier stands at its focus with a single chair on top and a lamp burning beside it.',
   'desc.recording': 'A round room under the rock. Tens of thousands of wax cylinders on shelves from floor to ceiling. One oil lamp. A phonograph with a brass horn. At the far side, a skin stretched in an iron ring.',
-  'desc.impossible': 'A corridor that turns left and keeps turning. Thousands of pale wires grow from the floor and the roof and lean as sound passes.',
+  'desc.impossible': 'A corridor of wet stone that turns left and keeps turning. Pale wires grow from the floor and the roof and lean as sound passes.',
   'desc.other': 'Still black water under a red line of dawn. Forty-one wooden chairs in rows. In the middle, a desk, a lamp, a chair.',
   'desc.last': 'Nothing but a line.',
 
@@ -325,7 +325,7 @@ export const es: Record<TextKey, string> = {
   'desc.call': 'Mar abierto de noche. Un cabo al frente. Sobre él, un cuenco de hormigón de treinta metros, orientado al mar, con un agujero oscuro en el centro.',
   'desc.hall': 'El cuenco de hormigón se alza por tres lados como el interior de una concha. En su foco hay un pilar con una sola silla encima y una lámpara encendida al lado.',
   'desc.recording': 'Una sala redonda bajo la roca. Decenas de miles de cilindros de cera en estantes del suelo al techo. Una lámpara de aceite. Un fonógrafo con bocina de latón. Al fondo, una piel tensada en un aro de hierro.',
-  'desc.impossible': 'Un pasillo que gira a la izquierda y sigue girando. Miles de alambres pálidos crecen del suelo y del techo y se inclinan cuando pasa el sonido.',
+  'desc.impossible': 'Un pasillo de piedra mojada que gira a la izquierda y sigue girando. Alambres pálidos crecen del suelo y del techo y se inclinan cuando pasa el sonido.',
   'desc.other': 'Agua negra e inmóvil bajo una línea roja de amanecer. Cuarenta y una sillas de madera en filas. En medio, un escritorio, una lámpara, una silla.',
   'desc.last': 'Nada más que una línea.',
 

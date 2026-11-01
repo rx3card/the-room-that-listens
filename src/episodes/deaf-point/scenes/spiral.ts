@@ -93,7 +93,7 @@ function wires(q: Quality) {
     },
     vertexShader: /* glsl */ `
       attribute vec3 aBase,aDir,aInfo; uniform float uT,uWave,uAmp,uStill,uPx; uniform vec3 uG0,uG1,uG2,uG3,uCam;
-      varying float vTip,vLit,vFog,vNear,vFade;
+      varying float vTip,vLit,vFog,vNear,vFade,vReach;
       vec3 repel(vec3 p,vec3 a,vec3 b){ vec3 pa=p-a,ba=b-a; float h=clamp(dot(pa,ba)/dot(ba,ba),0.,1.); vec3 d=pa-ba*h; float l=length(d)+.001; float s=smoothstep(.62,.16,l); return d/l*s*.62; }
       void main(){
         float y=position.y; float p=aInfo.x, L=aInfo.y, s=aInfo.z;
@@ -115,16 +115,17 @@ function wires(q: Quality) {
         vFade=clamp(width/px*2.5,.3,1.);
         vec3 pos=w+side*position.x*max(width,px);
         vec4 mv=viewMatrix*vec4(pos,1.);
-        vTip=y; vLit=env; vFog=1.-exp(-(-mv.z)*.12); vNear=smoothstep(.5,2.4,-mv.z);
+        vTip=y; vLit=env; vReach=smoothstep(10.,4.5,dist); // far wires would pile into a curtain over the painting
+         vFog=1.-exp(-(-mv.z)*.12); vNear=smoothstep(.5,2.4,-mv.z);
         gl_Position=projectionMatrix*mv;
       }`,
     fragmentShader: /* glsl */ `
-      varying float vTip,vLit,vFog,vNear,vFade;
+      varying float vTip,vLit,vFog,vNear,vFade,vReach;
       void main(){
         vec3 c=mix(vec3(.02,.021,.025),vec3(.44,.43,.4),vTip*vTip)*(.25+.75*vNear);
         c=mix(c,vec3(1.,.42,.07)*1.1,vLit*vTip);
         c=mix(c,vec3(.004,.005,.008),vFog);
-        gl_FragColor=vec4(c,vFade*(1.-vFog*.8)*(.3+.7*vNear));
+        gl_FragColor=vec4(c,vFade*vReach*(1.-vFog*.8)*(.3+.7*vNear));
       }`,
   })
   const mesh = new THREE.Mesh(g, m)
@@ -218,7 +219,7 @@ export async function buildSpiral(q: Quality): Promise<Built> {
     update(t, dt, live: Live) {
       gl.uT.value = t
       gl.uCam.value.copy(live.cam.position)
-      gl.uPx.value = (2 * Math.tan(THREE.MathUtils.degToRad(live.cam.fov / 2))) / innerHeight / q.dpr
+      gl.uPx.value = (2 * Math.tan(THREE.MathUtils.degToRad(live.cam.fov / 2))) / innerHeight / Math.min(devicePixelRatio, q.dpr)
       gl.uWave.value = (t * 0.021) % 1.2
       gl.uAmp.value = 0.4 + live.level * 4
       stillness += (live.lean - stillness) * Math.min(1, dt * 3)

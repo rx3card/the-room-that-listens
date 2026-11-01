@@ -25,11 +25,11 @@ La prueba del final por inacción salta directamente al escritorio del capítulo
 | Taste `lint.mjs` | 0 FAIL. Excepciones marcadas: sombra de texto y degradado neutro sobre imagen en vivo, por legibilidad |
 | Taste `inspect.mjs` | 3 FAIL de reglas pensadas para páginas con scroll (pocas fotos, página quieta, título tardío). Este último destapó un error real de `pointer-events`, ya corregido. No se volvió a ejecutar tras corregirlo |
 | Impeccable `detect` | Sin hallazgos |
-| Impeccable, revisión final independiente | Segunda revisión, ya con las 11 vistas pintadas: **rebuild solo para la espiral**. Las salas con imagen pasan como materia creíble |
+| Impeccable, revisión final independiente | Tercera revisión, con las 16 vistas pintadas: **fix**. Ya no pide reconstruir nada. Sus correcciones aplicables se hicieron después; no se ha repetido la revisión |
 
 La primera revisión encontró defectos que se corrigieron: papeles sin texto, ámbar que viraba a limón, moteado en reposo, resolución baja en teléfono, contraste del registro y etiquetas cortadas. La segunda añadió lista de cilindros incompleta en teléfono, grano en reposo, marcas sobre nada y borde del velo inferior, también corregidos. No se ha repetido la revisión tras esas correcciones.
 
-Quedan abiertos: las cinco vistas de la espiral y la continuidad de `other-shore`, listas en ASSETS_TO_GENERATE.md; las sillas caídas siguen siendo 3D sobre la pintura; y el asiento recuerda a una alcantarilla, cerca del pasillo oscuro que la tesis rechaza.
+Quedan abiertos, porque necesitan imágenes nuevas: las sillas caídas siguen siendo 3D sobre la pintura y no recortes pintados; el escritorio de las vistas lejanas no coincide con el de cerca (lámpara, acabado, radio); los alambres no nacen de la piedra pintada. En teléfono, las listas tapan parte del objeto en escritorio y relé. El asiento recuerda a una alcantarilla.
 
 ## Revisado por una persona o por capturas
 
@@ -55,5 +55,5 @@ Se miraron capturas de 14 momentos en 1440 × 900 y 390 × 844. Rendimiento en P
 | ¿Las decisiones importan? | Sí: cambian sillas, registro, finales y la siguiente visita |
 | ¿Se entiende cómo avanzar? | Sí en las capturas; falta probarlo con alguien real |
 | ¿Funciona en móvil? | En emulación |
-| ¿Los escenarios están bien compuestos? | Sí en las once vistas pintadas. La espiral y los movimientos de cámara aún delatan el 3D |
-| ¿Terminado? | La experiencia funciona de principio a fin. Falta la espiral pintada para cerrar la revisión visual |
+| ¿Los escenarios están bien compuestos? | Sí en las dieciséis vistas pintadas. Los movimientos de cámara y transiciones aún son 3D |
+| ¿Terminado? | La experiencia funciona de principio a fin. Faltan por probar sonido y dispositivos reales |

@@ -333,8 +333,8 @@ export async function buildHeadland(q: Quality): Promise<Built> {
     },
     anchors: {
       plate: plate.position.clone(),
-      box: box.position.clone(),
-      plan: box.position.clone().add(v3(1.1, -0.9, -0.5)), // the plan lies by the weather box in the painted view
+      box: v3(-2.19, 31.42, -25.25), // rays through the painted box, seen from the forecourt
+      plan: v3(-2.5, 31.76, -25),
       pier: v3(0, GROUND + 5.5, FOCUS.z - 0.7),
       hole: v3(0, CX + 0.2, 0.4),
       down: v3(0.8, CX - 0.5, FOCUS.z - 1.2),

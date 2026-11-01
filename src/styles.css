@@ -96,7 +96,8 @@ a { color: inherit; text-underline-offset: 0.2em; }
 .list { position: fixed; right: var(--gutter); top: 50%; transform: translateY(-50%); width: min(44ch, calc(100vw - 2 * var(--gutter))); display: flex; flex-direction: column; gap: 0; max-height: 66vh; overflow: auto; background: var(--black); }
 .list button { pointer-events: auto; text-align: left; padding: 0.62em 0.8em; background: var(--black); transition: background 0.15s, color 0.15s; }
 .list button:last-child { position: sticky; bottom: 0; background: var(--coal); }
-.list button:hover, .list button:focus-visible { background: var(--bone); color: var(--black); }
+.list button:focus-visible { background: var(--bone); color: var(--black); }
+@media (hover: hover) { .list button:hover { background: var(--bone); color: var(--black); } }
 
 .textstage { position: fixed; inset: 0; overflow: auto; pointer-events: auto; padding: var(--gutter); background: var(--coal); }
 .textstage h2 { font-size: var(--head); font-weight: 600; letter-spacing: -0.035em; line-height: 1; margin-bottom: 20px; }

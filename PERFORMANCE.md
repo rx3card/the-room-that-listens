@@ -35,7 +35,7 @@ No se ha medido en un móvil físico. Las capturas de teléfono son emuladas sob
 | Sombras | 2048 | 1024 | No |
 | Bloom y AO | Sí | Sí | No |
 | MSAA | 4× | 2× | No |
-| Alambres de la espiral | 9 000 | 5 000 | 2 400 |
+| Alambres de la espiral | 3 200 | 2 000 | 1 000 |
 | Cilindros | 16 000 | 16 000 | 7 500 |
 
 LITE conserva toda la narrativa e interacciones. Prefiere más resolución y menos efectos, porque en un móvil se nota más lo primero.

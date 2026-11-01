@@ -147,7 +147,7 @@ components:
 
 ## Overview
 
-Estado: las once vistas pintadas están integradas. La revisión final mantiene rebuild solo para la espiral.
+Estado: las dieciséis vistas pintadas están integradas. La última revisión dio fix: ninguna sala pide reconstrucción.
 
 **Creative North Star: "El oído en sección"**
 

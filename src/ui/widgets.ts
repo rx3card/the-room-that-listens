@@ -35,7 +35,7 @@ export class Strip {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     ctx.clearRect(0, 0, w, h)
     const env = this.envelope ? this.envelope[Math.floor(time * 20) % this.envelope.length] : 0
-    const a = Math.max(level, this.drive, env, 0.012 + (Math.sin(time * 0.31) * Math.sin(time * 0.17)) ** 8 * 0.5)
+    const a = Math.max(level, this.drive, env, 0.09 + Math.abs(Math.sin(time * 0.7)) * 0.08 + (Math.sin(time * 0.31) * Math.sin(time * 0.17)) ** 8 * 0.5)
     this.hist[this.head] = a * this.gain
     this.head = (this.head + 1) % this.hist.length
     this.drive *= 0.92
