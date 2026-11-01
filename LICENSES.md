@@ -28,4 +28,4 @@ Media are **not** covered by the MIT licence.
 
 The plates in `public/assets/plates/` were generated with ChatGPT and are subject to OpenAI's terms. They are not MIT.
 
-The project is personal for now. If it is ever published, re-check this table first. Audio files are only re-encoded, and the Archives page carries the attributions.
+Audio files are only re-encoded, and the Archives page carries the attributions. Reusing a CC BY-SA file means keeping its author credit and its licence.

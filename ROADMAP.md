@@ -23,6 +23,6 @@
 - Estaciones n.º 1 a 8.
 - Vale, 1967: dentro de la espiral.
 
-## Antes de publicar, si algún día se decide
+## Pendiente de comprobar
 
-Comprobar el nombre, revisar licencias y ejecutar otra revisión final. Nada se ha publicado ni subido.
+Colisiones de nombre y marcas.

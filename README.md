@@ -10,6 +10,14 @@ There are three endings. One of them has no button.
 
 > The word "story" here is literal: there are no lives, scores or failure states, and it can be finished with one finger.
 
+![The title: a sentence with a live signal where a word should be](docs/screens/title.jpg)
+
+![Acoustic Station No. 9 in the rain](docs/screens/hall.jpg)
+
+![The end of the spiral](docs/screens/s5.jpg)
+
+![Forty-one chairs in still water before dawn](docs/screens/other.jpg)
+
 ## Run it
 
 Requires Node 22 and pnpm.
@@ -52,6 +60,10 @@ Playable without sound, without a microphone, without WebGL (the whole story bec
 ## Documents
 
 [PRODUCT](PRODUCT.md) · [DESIGN](DESIGN.md) · [Story bible, spoilers](STORY_BIBLE.md) · [Experience map](EXPERIENCE_MAP.md) · [Audio](AUDIO_DESIGN.md) · [Research](RESEARCH.md) · [Performance](PERFORMANCE.md) · [Validation](VALIDATION.md) · [Roadmap](ROADMAP.md) · [Contributing](CONTRIBUTING.md)
+
+## Deploy
+
+A static Vite site: on Vercel, import the repository and keep the detected settings. HTTPS is required for the optional microphone, and Vercel provides it.
 
 ## Licences
 
