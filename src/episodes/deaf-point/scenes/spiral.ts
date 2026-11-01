@@ -100,7 +100,7 @@ function wires(q: Quality) {
         vec3 w=aBase+aDir*y*L;
         float f=mix(5.,1.,p);
         float tw=sin(p*210.-uT*2.3*f+s*1.2);
-        float env=exp(-pow((p-uWave)*18.,2.));
+        float env=exp(-pow((p-uWave)*42.,2.));
         float k=y*y;
         vec3 sway=vec3(sin(uT*.9+s*40.),0.,cos(uT*.7+s*30.))*.04*(1.-uStill);
         w+=normalize(cross(aDir,vec3(.3,.2,.9)))*tw*(.05*uAmp+env*.3)*k*(1.-uStill*.9)+sway*k;
@@ -110,7 +110,7 @@ function wires(q: Quality) {
         vec3 side=normalize(cross(aDir,uCam-w));
         float dist=distance(uCam,w);
         // never thinner than about a pixel; beyond that a wire fades instead of breaking into dashes
-        float width=mix(.013,.004,y);
+        float width=mix(.0055,.0018,y);
         float px=dist*uPx;
         vFade=clamp(width/px*2.5,.3,1.);
         vec3 pos=w+side*position.x*max(width,px);
@@ -121,10 +121,10 @@ function wires(q: Quality) {
     fragmentShader: /* glsl */ `
       varying float vTip,vLit,vFog,vNear,vFade;
       void main(){
-        vec3 c=mix(vec3(.02,.021,.025),vec3(.6,.58,.54),vTip*vTip)*(.25+.75*vNear);
-        c=mix(c,vec3(1.,.42,.07)*2.4,vLit*vTip);
+        vec3 c=mix(vec3(.02,.021,.025),vec3(.44,.43,.4),vTip*vTip)*(.25+.75*vNear);
+        c=mix(c,vec3(1.,.42,.07)*1.1,vLit*vTip);
         c=mix(c,vec3(.004,.005,.008),vFog);
-        gl_FragColor=vec4(c,vFade*(1.-vFog*.8));
+        gl_FragColor=vec4(c,vFade*(1.-vFog*.8)*(.3+.7*vNear));
       }`,
   })
   const mesh = new THREE.Mesh(g, m)

@@ -36,7 +36,7 @@ SINIUS, *The Silence Before the Haunting*, CC BY 4.0, [Free Music Archive](https
 
 ## Vistas pintadas
 
-Once imágenes generadas con ChatGPT por el dueño del proyecto a partir de `docs/plate-refs/`, con los prompts de ASSETS_TO_GENERATE.md. Convertidas a WebP calidad 86, sin retoque. Ruta: `public/assets/plates/`.
+Dieciséis imágenes generadas con ChatGPT por el dueño del proyecto a partir de `docs/plate-refs/`, con los prompts de ASSETS_TO_GENERATE.md. Convertidas a WebP calidad 86, sin retoque. Ruta: `public/assets/plates/`.
 
 ## Texturas y modelos
 

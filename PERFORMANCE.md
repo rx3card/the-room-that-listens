@@ -35,7 +35,7 @@ No se ha medido en un móvil físico. Las capturas de teléfono son emuladas sob
 | Sombras | 2048 | 1024 | No |
 | Bloom y AO | Sí | Sí | No |
 | MSAA | 4× | 2× | No |
-| Alambres de la espiral | 22 000 | 11 000 | 4 200 |
+| Alambres de la espiral | 9 000 | 5 000 | 2 400 |
 | Cilindros | 16 000 | 16 000 | 7 500 |
 
 LITE conserva toda la narrativa e interacciones. Prefiere más resolución y menos efectos, porque en un móvil se nota más lo primero.
@@ -51,5 +51,5 @@ LITE conserva toda la narrativa e interacciones. Prefiere más resolución y men
 ## Pendiente
 
 - KTX2 no se usó porque `toktx` no está instalado. Las texturas son WebP, que ocupan más memoria de GPU.
-- Las once vistas pintadas pesan 1,3 MB en total. Con el 3D debajo aún activo no ahorran GPU; ocultarlo sería una mejora posible.
+- Las dieciséis vistas pintadas pesan 1,9 MB en total. Con el 3D debajo aún activo no ahorran GPU; ocultarlo sería una mejora posible.
 - Las vistas son de 1536 × 1024: en pantallas 4K se notará que están ampliadas.

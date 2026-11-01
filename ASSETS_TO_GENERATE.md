@@ -1,6 +1,6 @@
 # Imágenes para generar con ChatGPT
 
-**Estado: las once están generadas e integradas en `public/assets/plates/`.** Los originales están en `assets-src/plates/`. Este documento queda para regenerar alguna.
+**Estado: las dieciséis están generadas e integradas en `public/assets/plates/`.** Los originales están en `assets-src/plates/`. Este documento queda para regenerar alguna.
 
 Cada una se proyecta sobre un encuadre fijo, como un matte painting de cine. La luz que parpadea, el polvo, la lluvia y las marcas interactivas siguen vivos encima.
 
@@ -144,7 +144,7 @@ Close view from behind a steel desk standing in black water. On the desk a 1930s
 
 ## Segunda tanda
 
-Seis imágenes más, que cierran lo que la revisión independiente dejó abierto.
+Seis imágenes más, ya integradas. `other-shore` sustituye a la de la primera tanda. Nota: `docs/plate-refs/spiral-s5.jpg` sale negra; el resultado actual se generó a partir del prompt.
 
 Para cada una de las cinco de la espiral:
 

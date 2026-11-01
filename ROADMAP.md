@@ -9,7 +9,7 @@
 
 ## Después
 
-- Pintar la espiral y un plano por transición: hoy son lo único que sigue en 3D puro.
+- Pintar los movimientos de cámara y las transiciones: hoy son lo único que sigue en 3D puro.
 - Versiones a mayor resolución de las vistas pintadas para pantallas 4K.
 
 - Más cilindros: un registro completo de las 41 personas.
